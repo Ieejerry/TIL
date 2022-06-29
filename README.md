@@ -9,3 +9,4 @@
 - [JAVA 실행](https://github.com/ehyssng/TIL/blob/master/Java/Practice.md)
 - [개발도구 소개](https://github.com/ehyssng/TIL/blob/master/Java/Development_tools.md)
 - [숫자와 문자](https://github.com/ehyssng/TIL/blob/master/Java/Numbers_and_String.md)
+- [변수](https://github.com/ehyssng/TIL/blob/master/Java/Variable.md)
