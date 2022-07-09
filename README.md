@@ -24,3 +24,5 @@
 - [입력과 출력](https://github.com/ehyssng/TIL/blob/master/Java/Input_and_Output.md)
 - [객체지향 프로그래밍](https://github.com/ehyssng/TIL/blob/master/Java/Object_Oriented_Programming.md)
 - [클래스와 인스턴스 그리고 객체](https://github.com/ehyssng/TIL/blob/master/Java/Class_and_Instance_and_Object.md)
+- [클래스 맴버와 인스턴스 맴버](https://github.com/ehyssng/TIL/blob/master/Java/ClassMemeber_and_InstanceMember.md)
+- [유효범위](https://github.com/ehyssng/TIL/blob/master/Java/Scope.md)
