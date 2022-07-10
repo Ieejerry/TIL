@@ -26,3 +26,5 @@
 - [클래스와 인스턴스 그리고 객체](https://github.com/ehyssng/TIL/blob/master/Java/Class_and_Instance_and_Object.md)
 - [클래스 맴버와 인스턴스 맴버](https://github.com/ehyssng/TIL/blob/master/Java/ClassMemeber_and_InstanceMember.md)
 - [유효범위](https://github.com/ehyssng/TIL/blob/master/Java/Scope.md)
+- [초기화와 생성자](https://github.com/ehyssng/TIL/blob/master/Java/Constructor.md)
+- [상속](https://github.com/ehyssng/TIL/blob/master/Java/Inheritance.md)
