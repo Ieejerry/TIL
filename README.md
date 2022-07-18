@@ -40,3 +40,4 @@
 - [인터페이스](https://github.com/ehyssng/TIL/blob/master/Java/Interface.md)
 - [다형성](https://github.com/ehyssng/TIL/blob/master/Java/Polymorphism.md)
 - [예외1](https://github.com/ehyssng/TIL/blob/master/Java/Exception1.md)
+- [예외2](https://github.com/ehyssng/TIL/blob/master/Java/Exception2.md)
