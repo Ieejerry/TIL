@@ -43,3 +43,4 @@
 - [예외2](https://github.com/ehyssng/TIL/blob/master/Java/Exception2.md)
 - [예외3](https://github.com/ehyssng/TIL/blob/master/Java/Exception3.md)
 - [Object 클래스](https://github.com/ehyssng/TIL/blob/master/Java/Object_Class.md)
+- [Enum](https://github.com/ehyssng/TIL/blob/master/Java/Enum.md)
