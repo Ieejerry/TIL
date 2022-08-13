@@ -52,3 +52,4 @@
 - [자바](https://github.com/ehyssng/TIL/blob/master/Java_Review/Java.md)
 - [자바개발환경 구축하기](https://github.com/ehyssng/TIL/blob/master/Java_Review/Java_Development_Environment.md)
 - [자바로 프로그램 작성하기](https://github.com/Jerrystime/TIL/blob/master/Java_Review/Java_programming.md)
+- [변수](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Variable.md)
