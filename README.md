@@ -54,3 +54,4 @@
 - [자바로 프로그램 작성하기](https://github.com/Jerrystime/TIL/blob/master/Java_Review/Java_programming.md)
 - [변수](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Variable.md)
 - [변수의 타입](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Type_of_variable.md)
+- [진법](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Numeral_system.md)
