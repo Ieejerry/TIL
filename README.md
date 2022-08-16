@@ -55,3 +55,4 @@
 - [변수](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Variable.md)
 - [변수의 타입](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Type_of_variable.md)
 - [진법](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Numeral_system.md)
+- [기본형](https://github.com/Ieejerry/TIL/blob/master/Java_Review/Primitive_type.md)
