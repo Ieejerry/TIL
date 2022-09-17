@@ -72,3 +72,5 @@
 - [클래스와 객체](https://github.com/leehenson/TIL/blob/master/Java_Review/Class_and_object.md)
 - [변수와 메소드](https://github.com/leehenson/TIL/blob/master/Java_Review/Variable_and_method.md)
 - [오버로딩](https://github.com/leehenson/TIL/blob/master/Java_Review/Overloading.md)
+- [생성자](https://github.com/leehenson/TIL/blob/master/Java_Review/Constructor.md)
+- [변수의 초기화](https://github.com/leehenson/TIL/blob/master/Java_Review/Initialize_a_variable.md)
