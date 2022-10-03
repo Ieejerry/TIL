@@ -80,3 +80,4 @@
 - [제어자](https://github.com/leehenson/TIL/blob/master/Java_Review/Modifier.md)
 - [다형성](https://github.com/leehenson/TIL/blob/master/Java_Review/Polymorphism.md)
 - [추상 클래스](https://github.com/leehenson/TIL/blob/master/Java_Review/Abstract_class.md)
+- [인터페이스](https://github.com/leehenson/TIL/blob/master/Java_Review/Interface.md)
