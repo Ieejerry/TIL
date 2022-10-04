@@ -81,3 +81,4 @@
 - [다형성](https://github.com/leehenson/TIL/blob/master/Java_Review/Polymorphism.md)
 - [추상 클래스](https://github.com/leehenson/TIL/blob/master/Java_Review/Abstract_class.md)
 - [인터페이스](https://github.com/leehenson/TIL/blob/master/Java_Review/Interface.md)
+- [내부 클래스](https://github.com/leehenson/TIL/blob/master/Java_Review/Inner_class.md)
