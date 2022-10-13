@@ -692,3 +692,427 @@ Card3
 final class Card3
 class Card3
 ```
+
+</br>
+
+### 1.2 String클래스
+
+기존의 다른 언어에서는 문자열을 char형의 배열로 다루었으나 자바에서는 문자열을 위한 클래스를 제공한다. 그것이 바로 `String`클래스인데, `String`클래스는 문자열을 저장하고 이를 다루는데 필요한 메소드를 함께 제공한다.
+
+</br>
+
+### 변경 불가능한(immutable) 클래스
+
+`String`클래스에는 문자열을 저장하기 위해서 문자형 배열 참조변수(char[]) `value`를 인스턴스 변수로 정의해놓고 있다. 인스턴스 생성 시 생성자의 매개변수로 입력받는 문자열은 이 인스턴스변수(`value`)에 문자열 배열(char[])로 저장된다.
+
+> String클래스는 앞에 final이 붙어 있으므로 다른 클래스의 조상이 될 수 없다.
+
+``` java
+public fianl class String implements java.io.Serializable, Comparable {
+	private char[] value;
+		...
+}
+```
+
+한번 생성된 `String`인스턴스가 갖고 있는 문자열은 읽어올 수만 있고, 변경할 수는 없다.
+
+예를 들어 아래의 코드와 같이 '+'연산자를 이용해서 문자열을 결합하는 경우 인스턴스내의 문자열이 바뀌는 것이 아니라 새로운 문자열("ab")이 담긴 `String`인스턴스가 생성되는 것이다.
+
+![image](https://ifh.cc/g/ZcCVpw.png)
+
+이처럼 덧셈연산자 '+'를 사용해서 문자열을 결합하는 것은 매 연산 시 마다 새로운 문자열을 가진 `String`인스턴스가 생성되어 메모리공간을 차지하게 되므로 가능한 결합횟수를 줄이는 것이 좋다.
+
+문자열간의 결합이나 추출 등 문자열을 다루는 작업이 많이 필요한 경우에는 `String`클래스 대신 `StringBuffer`클래스를 사용하는 것이 좋다. `StringBuffer`인스턴스에 저장된 문자열은 변경이 가능하므로 하나의 `StringBuffer`인스턴스만으로도 문자열을 다루는 것이 가능하다.
+
+</br>
+
+### 문자열 비교
+
+문자열을 만들 때는 두 가지 방법, 문자열 리터럴을 지정하는 방법과 `String`클래스의 생성자를 사용해서 만드는 방법이 있다.
+
+``` java
+String str1 = "abc";	// 문자열 리터럴 "abc"의 주소가 str1에 저장됨
+String str2 = "abc";	// 문자열 리터럴 "abc"의 주소가 str2에 저장됨
+String str3 = new String("abc");	// 새로운 String인스턴스를 생성
+String str4 = new String("abc");	// 새로운 String인스턴스를 생성
+```
+
+`String`클래스의 생성자를 이용한 경우에는 `new`연산자에 의해서 메모리할당이 이루어지기 때문에 항상 새로운 `String`인스턴스가 생성된다. 그러나 문자열 리터럴은 이미 존재하는 것을 재사용하는 것이다.
+
+> 문자열 리터럴은 클래스가 메모리에 로드될 때 자동적으로 미리 생성된다.
+
+![image](https://ifh.cc/g/oWP2S5.png)
+
+`equals()`를 사용했을 때는 두 문자열의 내용("abc")을 비교하기 때문에 두 경우 모두 `true`를 결과로 얻는다. 하지만, 각 `String`인스턴스의 주소를 등가비교연산자 `==`로 비교했을 떄는 결과가 다르다.
+
+예제 9-11 / ch9 / StringEx1.java
+
+``` java
+public class SringEx1 {
+	public static void main(String[] args) {
+		String str1 = "abc";
+		String str2 = "abc";
+		System.out.println("String str1 = \"abc\";");
+		System.out.println("String str2 = \"abc\";");
+		
+		System.out.println("str1 == str2 ? " + (str1 == str2));
+		System.out.println("str1.equals(str2) ? " + str1.equals(str2));
+		System.out.println();
+		
+		String str3 = new String("\"abc\"");
+		String str4 = new String("\"abc\"");
+		
+		System.out.println("String str3 = new String(\"abc\");");
+		System.out.println("String str4 = new String(\"abc\");");
+		
+		System.out.println("str3 == str4 ? " + (str3 == str4));
+		System.out.println("str3.equals(str4) ? " + str3.equals(str4));
+	}
+}
+```
+
+```
+String str1 = "abc";
+String str2 = "abc";
+str1 == str2 ? true
+str1.equals(str2) ? true
+
+String str3 = new String("abc");
+String str4 = new String("abc");
+str3 == str4 ? false
+str3.equals(str4) ? true
+```
+
+</br>
+
+### 문자열 리터럴
+
+자바 소스파일에 포함된 모든 문자열 리터럴은 컴파일 시에 클래스 파일에 저장된다. 이 때 같은 내용의 문자열 리터럴은 한번만 저장된다. 문자열 리터럴도 `String`인스턴스이고, 한번 생성하면 내용을 변경할 수 없으니 하나의 인스턴스를 공융하면 된다.
+
+예제 9-12 / ch9 / StringEx2.java
+
+``` java
+public class StringEx2 {
+	public static void main(String[] args) {
+		String s1 = "AAA";
+		String s2 = "AAA";
+		String s3 = "AAA";
+		String s4 = "BBB";
+	}
+}
+```
+
+String리터럴들은 컴파일시에 클래스파일에 저장된다.
+
+그래서 위의 예제를 실행하면 "AAA"를 담고 있는 `String`인스턴스가 하나 생성된 후, 참조변수 `s1`, `s2`, `s3`는 모두 이 `String`인스턴스를 참조하게 된다.
+
+![image](https://ifh.cc/g/cYw2hd.png)
+
+클래스 파일에는 소스파일에 포함된 모든 리터럴의 목록이 있다. 해당 클래스 파일이 클래스 로더에 의해 메모리에 올라갈 때, 이 리터럴의 목록에 있는 리터럴들이 JVM내에 있는 '상수 저장소(constant pool)'에 저장된다. 이 때, 이곳에 "AAA"와 같은 문자열 리터럴이 자동적으로 생성되어 저장되는 것이다.
+
+</br>
+
+### 빈 문자열(empty string)
+
+char형 배열도 길이가 0인 배열을 생성할 수 있고, 이 배열을 내부적으로 가지고 있는 문자열이 바로 빈 문자열이다.
+
+`String s = "";`과 같은 문장이 있을 때, 참조변수 `s`가 참조하고 있는 `String`인스턴스는 내부에 `new char[0]`과 같이 길이가 0인 char형 배열을 저장하고 있는 것이다.
+
+``` java
+char[] chArr = new char[0];	// 길이가 0인 char배열
+int[] iArr = {};	// 길이가 0인 int배열
+```
+
+길이가 0이기 때문에 아무런 문자도 저장할 수 없는 배열이라 무의미하게 느껴지겠지만 어쨋든 이러한 표현이 가능하다.
+
+그러나 `String s == "":`과 같은 표현이 가능하다고 해서 `char c = "";`와 같은 표현도 가능한 것은 아니다. char형 변수에는 반드시 하나의 문자를 지정해야한다.
+
+![image](https://ifh.cc/g/YRWWkS.png)
+
+일반적으로 변수를 선언할 때, 각 타입의 기본값으로 초기화 하지만 String은 참조형 타입의 기본값인 `null`보다는 빈 문자열로, char형은 기본값인 `\u0000` 대신 공백으로 초기화 하는 것이 보통이다.
+
+>  '\u0000'은 유니코드의 첫 번째 문자로써 아무런 문자도 지정되지 않은 빈 문자이다.
+
+예제 9-13 / ch9 / StringEx3.java
+
+``` java
+public class StringEx3 {
+	public static void main(String[] args) {
+		// 길이가 0인 char배열을 생성한다.
+		char[] cArr = new char[0];	// char[] cArr = {};와 같다.
+		String s = new String(cArr);	// String s = new String("");와 같다.
+		
+		System.out.println("cArr.length = " + cArr.length);
+		System.out.println("@@@" + s + "@@@");
+	}
+}
+```
+
+```
+cArr.length = 0
+@@@@@@
+```
+
+길이가 0인 배열을 생성해서 char형 배열 참조변수 `cArr`를 초기화 해주었다. 길이가 0이긴 해도 배열이 생성되며 생성된 배열의 주소값이 참조변수 `cArr`에 저장된다.
+
+</br>
+
+### String클래스의 생성자와 메소드
+
+아래의 표는 `String`클래스 내에 정의된 생성자와 메소드의 목록이다. 전체 목록은 아니고, 자주 사용될만한 것들만 뽑았는데도 거의 다 포함되었다.
+
+![image](https://ifh.cc/g/GpKRQk.png)
+
+> CharSequence는 JDK1.4부터 추가된 인터페이스로 String, StringBuffer 등의 클래스가 구현하였다.
+
+> contains(CharSequence s), replace(CharSequence old, CharSequence nw)는 JDK1.5부터 추가되었다.
+
+> java.util.Date dd = new java.util.Date()에서 생성된 Date인스턴스는 현재 시간을 갖는다.
+
+</br>
+
+### join()과 StringJoiner
+
+`join()`은 여러 문자열 사이에 구분자를 넣어서 결합한다. 구분자로 문자열을 자르는 `split()`과 반대의 작업을 한다고 생각하면 이해하기 쉽다.
+
+``` java
+String animals = "dog,cat,bear";
+String[] arr = animals.split(",");	// 문자열을 ','를 구분자로 나눠서 배열에 저장
+String str = String.join("-", arr);	// 배열의 문자열을 '-'로 구분해서 결합
+System.out.println(str);	// dog-cat-bear
+```
+
+`java.util.StringJoiner`클래스를 사용해서 문자열을 결합할 수도 있는데, 사용하는 방법은 간단하다.
+
+``` java
+StringJoiner sj = new StringJoiner(",", "[", "]");
+String[] strArr = { "aaa", "bbb", "ccc" };
+
+for(String s : strArr)
+	sj.add(s.toUpperCase());
+
+System.out.println(sj.toString());	// [AAA,BBB,CCC]
+```
+
+> join()과 java.util.StringJoiner는 JDK1.8부터 추가되었다.
+
+예제 9-14 / ch9 / StringEx4.java
+
+``` java
+import java.util.StringJoiner;
+
+public class StringEx4 {
+	public static void main(String[] args) {
+		String animals = "dog,cat,bear";
+		String[] arr = animals.split(",");
+		
+		System.out.println(String.join("-", arr));
+		
+		StringJoiner sj = new StringJoiner("/", "[", "]");
+		for(String s : arr)
+			sj.add(s);
+		
+		System.out.println(sj.toString());
+	}
+}
+```
+
+```
+dog-cat-bear
+[dog/cat/bear]
+```
+
+</br>
+
+### 유니코드의 보충문자
+
+위 표의 메소드 중에 매개변수의 타입이 char인 것들이 있고, int인 것들도 있다. 매개변수의 타입이 int인 이유는 확장된 유니코드를 다루기 위해서이다.
+
+유니코드는 원래 2 byte, 즉 16비트 문자체계인데, 이걸로도 모자라서 20비트로 확장하게 되었다. 그래서 하나의 문자를 char타입으로 다루지 못하고, int타입으로 다룰 수 밖에 없다. 확장에 의해 새로 추가된 문자들을 '보충 문자(supplementray character)'라고 하는데, `String`클래스의 메소드 중에서는 보충 문자를 지우너하는 것이 있고 지원하지 않는 것도 있다. 매개변수가 `int ch`인 것들은 보충문자를 지원하는 것이고, `char ch`인 것들은 지원하지 않는 것들이다.
+
+</br>
+
+### 문자 인코딩 변환
+
+`getBytes(String charsetName)`를 사용하면, 문자열의 문자 인코딩을 다른 인코딩으로 변경할 수 있다. 자바가 UTF-16을 사용하지만, 문자열 리터럴에 포함되는 문자들은 OS의 인코딩을 사용한다. 한글 윈도우즈의 경우 문자 인코딩으로 CP949를 사용하며, UTF-8로 변경하려면, 아래와 같이 한다.
+
+> 사용가능한 문자 인코딩 목록은 'System.out.println(java.nio.charse.Charset.availableCharsets());'로 모두 출력할 수 있다.
+
+``` java
+byte[] utf8_str = "가".getBytes("UTF-8");	// 문자열을 UTF-8로 변환
+String str = new String(utf8_str, "UTF-8");	// byte배열을 문자열로 변환
+```
+
+서로 다른 문자 인코딩을 사용하는 컴퓨터 간에 데이터를 주고받을 때는 적절한 문자 인코딩이 필요하다. 그렇지 않으면 알아볼 수 없는 내용의 문서를 보게 된다.
+
+예제 9-15 / ch9 / StringEx5.java
+
+``` java
+import java.util.StringJoiner;
+
+public class StringEx5 {
+	public static void main(String[] args) throws Exception {
+		String str = "가";
+		
+		byte[] bArr = str.getBytes("UTF-8");
+		byte[] bArr2 = str.getBytes("CP949");
+		
+		System.out.println("UTF-8 : " + joinByteArr(bArr));
+		System.out.println("CP949 : " + joinByteArr(bArr2));
+		
+		System.out.println("UTF-8 : " + new String(bArr, "UTF-8"));
+		System.out.println("CP949 : " + new String(bArr2, "CP949"));
+	}
+	
+	static String joinByteArr(byte[] bArr) {
+		StringJoiner sj = new StringJoiner(":", "[", "]");
+		
+		for(byte b : bArr)
+			sj.add(String.format("%02X", b));
+		return sj.toString();
+	}
+}
+```
+
+```
+UTF-8 : [EA:B0:80]
+CP949 : [B0:A1]
+UTF-8 : 가
+CP949 : 가
+```
+
+</br>
+
+### String.format()
+
+`format()`은 형식화된 문자열을 만들어내는 간단한 방법이다. `printf()`하고 사용법이 완전히 똑같다.
+
+``` java
+String str = String.format("%d 더하기 %d는 %d입니다.", 3, 5, 3 + 5);
+System.out.println(str);	// 3 더하기 5는 8입니다.
+```
+
+</br>
+
+### 기본형 값을 String으로 변환
+
+기본형을 문자열로 변경하는 방법은 숫자에 빈 문자열 ""을 더해주기만 하면 된다. 이 외에도 `valueOf()`를 사용하는 방법도 있다. 성능은 `valueOf()`가 더 좋지만, 빈 문자열을 더하는 방법이 간단하고 편하기 때문에 성능향상이 필요한 경우에만 `valueOf()`를 쓰면 된다.
+
+``` java
+int i = 100;
+String str1 = i + "";	// 100을 "100"으로 변환하는 방법1
+String str2 = String.valueOf(i);	// 100을 "100"으로 변환하는 방법2
+```
+
+> 참조변수에 String을 더하면, 참조변수가 가리키는 인스턴스의 toString()을 호출하여 String을 얻은 다음 결합한다.
+
+</br>
+
+### String을 기본형 값으로 변환
+
+반대로 `String`을 기본형으로 변환하는 방법도 간단하다. `valueOf()`를 쓰거나 `parseInt()`를 사용하면 된다.
+
+``` java
+int i = Integer.parseInt("100");	// "100"을 100으로 변환하는 방법1
+int i2 = Integer.valueOf("100");	// "100"을 100으로 변환하는 방법2
+```
+
+원래 `valueOf()`의 반환 타입은 int가 아니라 Integer인데, 오토박싱(auto-boxing)에 의해 Integer가 int로 자동 변환된다.
+
+``` java
+Interger i2 = Integer.valueOf("100");	// 원래의 반환 타입이 Interger
+```
+
+예전에는 `parseInt()`와 같은 메소드를 많이 썼는데, 메소드의 이름을 통일하기 위해 `valueOf()`가 나중에 추가되었다. `valueOf(String s)`는 메소드 내부에서 그저 `parseInt(String s)`를 호출할 뿐이므로, 두 메소드는 반환 타입만 다르지 같은 메소드이다.
+
+``` java
+public static Integer valueOf(String s) throws NumberFormatException {
+	return Interger.valueOf(parseInt(s, 10));	// 여기서 10은 10진수를 의미
+}
+```
+
+기본형과 문자열간의 변환방법을 정리하면 다음과 같다.
+
+![image](https://ifh.cc/g/nYmsFT.png)
+
+> byte, short을 문자열로 변경할 때는 String valueOf(int i)를 사용하면 된다.
+
+> 문자열 "A"를 문자 'A'로 변환하려면 char ch = "A".charAt(0);과 같이 하면 된다.
+
+Boolean, Byte와 같이 기본형 타입의 이름의 첫 글자가 대문자인 것은 래퍼 클래스(wrapper class)이다. 기본형 값을 감싸고 있는 클래스라는 뜻에서 붙여진 이름으로 기본형을 클래스로 표현한 것이다.
+
+예제 9-16 / ch9 / StringEx6.java
+
+``` java
+public class StringEx6 {
+	public static void main(String[] args) {
+		int iVal = 100;
+		String strVal = String.valueOf(iVal);	// int를 String으로 변환한다.
+		
+		double dVal = 200.0;
+		String strVal2 = dVal + "";	// String으로 변환하는 또 다른 방법
+		
+		double sum = Integer.parseInt("+" + strVal) + Double.parseDouble(strVal2);
+		
+		double sum2 = Integer.valueOf(strVal) + Double.valueOf(strVal2);
+		
+		System.out.println(String.join("", strVal, "+", strVal2, "=") + sum);
+		System.out.println(strVal + "+" + strVal2 + "=" + sum2);
+	}
+}
+```
+
+```
+100+200.0=300.0
+100+200.0=300.0
+```
+
+이 예제는 문자열과 기본형간의 변환의 예를 보여준다. `parseInt()`나 `parseFloat()`같은 메소드는 문자열에 공백 또는 문자가 포함되어 있는 경우 변환 시 예외(NumberFormatException)가 발생할 수 있으므로 주의해야 한다. 그래서 문자열 양끝의 공백을 제거해주는 `trim()`을 습관적으로 같이 사용하기도 한다.
+
+``` java
+int val = Integer.parseInt(" 123 ".trim());	// 문자열 양 끝의 공백을 제거 후 변환
+```
+
+그러나 부호를 의미하는 '+'나 소수점을 의미하는 '.'와 float형 값을 뜻하는 f와 같은 자료형 접미사는 허용된다. 단, 자료형에 알맞은 변환을 하는 경우에만 허용된다.
+
+> '+'가 포함된 문자열이 parseInt()로 변환가능하게 된 것은 JDK1.7부터이다.
+
+> Integer클래스의 static int parseInt(String s, int radix)를 사용하면 16진수 값으로 표현된 문자열도 변환할 수 있기 때문에 대소문자 구별 없이 a, b, c, d, e, f도 사용할 수 있따. int result = Integer.parseInt("a", 16);의 경우 result에는 정수 값 10이 저장된다.(16진수 a는 10진수로는 10을 뜻한다.)
+
+예제 9-17 / ch9 / StringEx7.java
+
+``` java
+public class StringEx7 {
+	public static void main(String[] args) {
+		String fullName = "Hello.java";
+		
+		// fullName에서 '.'의 위치를 찾는다.
+		int index = fullName.indexOf('.');
+		
+		// fullName의 첫번째 글자부터 '.'이 있는 곳까지 문자열을 추출한다.
+		String fileName = fullName.substring(0, index);
+		
+		// '.'의 다음 문자부터 시작해서 문자열의 끝까지 추출한다.
+		// fullName.substring(index + 1, fullName.length());의 결과와 같다.
+		String ext = fullName.substring(index + 1);
+		
+		System.out.println(fullName + "의 확장자를 제외한 이름은 " + fileName);
+		System.out.println(fullName + "의 확장자는 " + ext);
+	}
+}
+```
+
+```
+Hello.java의 확장자를 제외한 이름은 Hello
+Hello.java의 확장자는 java
+```
+
+위 예제는 `substring`메소드를 이용하여 한 문자열에서 내요으이 일부를 추출하는 예이다. `substring(int start, int end)`를 사용할 때 주의해야 할 점은 매개변수로 사용되는 문자열에서 각 문자의 위치를 뜻하는 index가 0부터 시작한다는 것과 `strat`부터 `end`의 범위 중 `end`위치에 있는 문자는 결과에 포함되지 않는다.
+
+> end에서 start값을 빼면 substring에 의해 추출될 글자의 수가 된다.
+
+> substring이 철자에 주의해야 한다. subString이 아니다.
+
+![image](https://ifh.cc/g/FK0s02.png)
+
+![image](https://ifh.cc/g/dQ57nR.png)
