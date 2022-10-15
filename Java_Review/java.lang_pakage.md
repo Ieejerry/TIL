@@ -1116,3 +1116,192 @@ Hello.java의 확장자는 java
 ![image](https://ifh.cc/g/FK0s02.png)
 
 ![image](https://ifh.cc/g/dQ57nR.png)
+
+</br>
+
+## 1.3 StringBuffer클래스와 StringBuilder클래스
+
+`String`크랠스는 인스턴스를 생성할 때 지정된 문자열을 변경할 수 없지만 `StringBuffer`클래스는 변경이 가능하다. 내부적으로 문자열 편집을 위한 버퍼(buffer)를 가지고 있으며, `StringBuffer`인스턴스를 생성할 때 그 크기를 지정할 수 있다.
+
+이 때, 편집할 문자열의 길이를 고려하여 버퍼의 길이를 충분히 잡아주는 것이 좋다. 편집 중인 문자열이 버퍼의 길이를 넘어서게 되면 버퍼의 길이를 늘려주는 작업이 추가로 수행되어야하기 때문에 작업효율이 떨어진다.
+
+`StringBuffer`클래스는 `String`클래스와 같이 문자열을 저장하기 위한 char형 배열의 참조변수를 인스턴스변수로 선언해 놓고 있다. `StringBuffer`인스턴스가 생성될 때, char형 배열이 생성되며 이 때 생성된 char형 배열을 인스턴스변수 `value`가 참조하게 된다.
+
+``` java
+public final class StringBuffer implements java.io.Serializable {
+	private char[] value;
+		...
+}
+```
+
+</br>
+
+### StringBuffer의 생성자
+
+`StringBuffer`클래스의 인스턴스를 생성할 때, 적절한 길이의 char형 배열이 생성되고, 이 배열은 문자열을 저장하고 편집하기 위한 공간(buffer)으로 사용된다.
+
+`StringBuffer`인스턴스를 생성할 때는 생성자 `StringBuffer(int length)`를 사용해서 `StringBuffer`인스턴스에 저장될 문자열의 길이를 고려하여 충분히 여유있는 크기로 지정하는 것이 좋다. `StringBuffer`인스턴스를 생성할 때, 버퍼의 크기를 지정해주지 않으면 16개의 문자를 저장할 수 있는 크기의 버퍼를 생성한다.
+
+``` java
+public StringBuffer(int length) {
+	value = new char[length];
+	shared = false;
+}
+
+public StringBuffe() {
+	this(16);	// 버퍼의 크기를 지정하지 않으면 버퍼의 크기는 16이 된다.
+}
+
+public StringBuffer(String str) {
+	this(str.length() + 16);	// 지정한 문자열의 길이보다 16이 더 크게 버퍼를 생성한다.
+	append(str);
+}
+```
+
+아래의 코드는 `StringBuffer`클래스의 일부인데, 버퍼의 크기를 변경하는 내용의 코드이다. `StringBuffer`인스턴스로 문자열을 다루는 작업을 할 때, 버퍼의 크기가 작업하려는 문자열의 길이보다 작을 때는 내부적으로 버퍼의 크기를 증가시키는 작업이 수행된다.
+
+배열의 길이는 변경될 수 없으므로 새로운 길이의 배열을 생성한 후에 이전 배열의 값을 복사해야 한다.
+
+``` java
+...
+// 새로운 길이(newCapacity)의 배열을 생성한다. newCapacity는 정수값이다.
+char newValue[] = new char[newCapacity];
+
+// 배열 value의 내용을 배열 newValue로 복사한다.
+System.out.arraycopy(value, 0, newValue, 0, count);	// count는 문자열의 길이
+value = newValue;	// 새로 생성된 배열의 주소를 참조변수 value에 저장
+```
+
+이렇게 함으로써 `StringBuffer`클래스의 인스턴스변수 `value`는 길이가 증가된 새로운 배열을 참조하게 된다.
+
+</br>
+
+### StringBuffer의 변경
+
+`String`과 달리 `StringBuffer`는 내용을 변경할 수 있다. 예를 들어 아래와 같이 `StringBuffer`를 생성하였다고 가정하겠다.
+
+![image](https://ifh.cc/g/3K2M5t.png)
+
+그리고 `sb`에 문자열 "123"을 추가하면,
+
+![image](https://ifh.cc/g/jXRKTW.png)
+
+`append()`는 반환타입이 `StringBuffer`인데 자신의 주소를 반환한다. 그래서 아래와 같은 문장이 수행되면, `sb`에 새로운 문자열이 추가되고 `sb`자신의 주소를 반환하여 `sb2`에는 `sb`의 주소인 0x100이 저장된다.
+
+![image](https://ifh.cc/g/rkJzzG.png)
+
+`sb`와 `sb2`가 모두 같은 `StringBuffer`인스턴스를 가리키고 있으므로 같은 내용이 출력된다. 그래서 하나의 `StringBuffer`인스턴스에 대해 아래와 같이 연속적으로 `append()`를 호출하는 것이 가능하다.
+
+![image](https://ifh.cc/g/8dVwBn.png)
+
+오른쪽 코드의 밑줄 친 부분이 `sb`이므로 여기에 다시 `append()`를 호추할 수 있는 것이다. 만일 `append()`의 반환타입이 `void`라면 이렇게 할 수 없다.
+
+> StringBuffer클래스에는 append()처럼 객체 자신을 반환하는 메소드들이 많이 있다.
+
+</br>
+
+### StringBUffer의 비교
+
+`String`클래스에서는 `equals`메소드를 오버라이딩해서 문자열의 내용을 비교하도록 구현되어 있지만, `StringBuffer`클래스는 `equals`메소드를 오버라이딩하지 않아서 `StringBuffer`클래스의 `equals`메소드를 사용해도 등가비교연산자(==)로 비교한 것과 같은 결과를 얻는다.
+
+``` java
+StringBuffer sb = new StringBuffer("abc");
+StringBuffer sb2 = new StringBuffer("abc");
+
+System.out.println(sb == sb2);	// false
+System.out.println(sb.equals(sb2));	// false
+```
+
+반면에 `toString()`은 오버라이딩되어 있어서 `StringBuffer`인스턴스에 `toString()`을 호출하면, 담고있는 문자열을 `String`으로 변환한다.
+
+그래서 `StringBuffer`인스턴스에 담긴 문자열을 비교하기 위해서는 `StringBuffer`인스턴스에 `toString()`을 호출해서 `String`인스턴스를 얻은 다음, 여기에 `equals`메소드를 사용해서 비교해야한다.
+
+``` java
+String s = sb.toString();
+String s2 = sb2.toString();
+
+System.out.println(s.equals(s2));	// true
+```
+
+예제 9-18 / ch9 / StringBufferEx1.java
+
+``` java
+public class StringBufferEx1 {
+	public static void main(String[] args) {
+		StringBuffer sb = new StringBuffer("abc");
+		StringBuffer sb2 = new StringBuffer("abc");
+		
+		System.out.println("sb == sb2 ? " + (sb == sb2));
+		System.out.println("sb.equals(sb2) ? " + sb.equals(sb2));
+		
+		// StringBuffer의 내용을 String으로 변환한다.
+		String s = sb.toString();	// String s = new String(sb);와 같다.
+		String s2 = sb2.toString();
+		
+		System.out.println("s.equals(s2) ? " + s.equals(s2));
+	}
+}
+```
+
+```
+sb == sb2 ? false
+sb.equals(sb2) ? false
+s.equals(s2) ? true
+```
+
+</br>
+
+### StringBuffer클래스의 생성자와 메소드
+
+`StringBuffer`클래스 역시 문자열을 다루기 위한 것이기 때문에 `String`클래스와 유사한 메소드를 많이 가지고 있다. 그리고 `StringBuffer`는 추가, 변경, 삭제와 같이 저장된 내용을 변경할 수 있는 메소드들이 추가로 제공된다.
+
+![image](https://ifh.cc/g/GO7jR2.png)
+
+예제 9-15 / ch9 / StringBufferEx2.java
+
+``` java
+public class StringBufferEx2 {
+	public static void main(String[] args) {
+		StringBuffer sb = new StringBuffer("01");
+		StringBuffer sb2 = sb.append(23);
+		sb.append('4').append(56);
+		
+		StringBuffer sb3 = sb.append(78);
+		sb3.append(9.0);
+		
+		System.out.println("sb = " + sb);
+		System.out.println("sb2 = " + sb2);
+		System.out.println("sb3 = " + sb3);
+		
+		System.out.println("sb = " + sb.deleteCharAt(10));
+		System.out.println("sb = " + sb.delete(3, 6));
+		System.out.println("sb = " + sb.insert(3, "abc"));
+		System.out.println("sb = " + sb.replace(6, sb.length(), "END"));
+		
+		System.out.println("capacity = " + sb.capacity());
+		System.out.println("length = " + sb.length());
+	}
+}
+```
+
+```
+sb = 0123456789.0
+sb2 = 0123456789.0
+sb3 = 0123456789.0
+sb = 01234567890
+sb = 01267890
+sb = 012abc67890
+sb = 012abcEND
+capacity = 18
+length = 9
+```
+
+</br>
+
+### StringBuilder란?
+
+`StringBuffer`는 멀티쓰레드에 안전(thread safe)하도록 동기화되어 있다. 멀티쓰레드 동기화는 `StringBuffer`의 성능을 떨어뜨린다. 그래서 멀티쓰레드로 작성된 프로그램이 아닌 경우, `StringBuffer`의 동기화는 불필요하게 성능만 떨어뜨리게 된다.
+
+그래서 `StringBuffer`에서 쓰레드의 동기화만 뺀 `StringBuilder`가 새로 추가되었다. `StringBuilder`는 `StringBUffer`와 완전히 똑같은 기능으로 작성되어 있어서, 소스코드에서 `StringBuffer`대신 `StringBuilder`를 사용하도록 바꾸기만 하면 된다.
+
+![image](https://ifh.cc/g/JyOKSf.png)
