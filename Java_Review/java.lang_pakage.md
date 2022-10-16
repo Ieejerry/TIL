@@ -1305,3 +1305,278 @@ length = 9
 그래서 `StringBuffer`에서 쓰레드의 동기화만 뺀 `StringBuilder`가 새로 추가되었다. `StringBuilder`는 `StringBUffer`와 완전히 똑같은 기능으로 작성되어 있어서, 소스코드에서 `StringBuffer`대신 `StringBuilder`를 사용하도록 바꾸기만 하면 된다.
 
 ![image](https://ifh.cc/g/JyOKSf.png)
+
+</br>
+
+## 1.4 Math클래스
+
+`Math`클래스는 기본적인 수학계산에 유용한 메소드로 구성되어 있다.
+
+`Math`클래스의 생성자는 접근 제어자가 private이기 때문에 다른 클래스에서 `Math`인스턴스를 생성할 수 없도록 되어있다. 그 이유는 클래스 내에 인스턴스변수가 하나도 없어서 인스턴스를 생성할 필요가 없기 때문이다. `Math`클래스의 메소드는 모두 static이며, 아래와 같이 2개의 상수만 정의해 놓았다.
+
+``` java
+public static final double E = 2.7182818284590452354;	// 자연로그의 밑
+public static final double PI = 3.14159265358979323846;	// 원주율
+```
+
+</br>
+
+### 올림, 버림, 반올림
+
+소수점 n번째 자리에서 반올림한 값을 얻기 위해서는 `round()`를 사용해야 하는데, 이 메소드는 항상 소수점 첫째자리에서 반올림을 해서 정수값(long)을 결과로 돌려준다.
+
+원하는 자리 수에서 반올림된 값을 얻기 위해서는 간단히 10의 n제곱으로 곱한 후, 다시 곱한 수로 나눠주기만 하면 된다.
+
+![image](https://ifh.cc/g/yl9nqA.png)
+
+만일 정수형 값인 100 또는 100L로 나눈다면, 결과는 정수형 값을 얻게 된다. 위의 경우 100.0대신 100으로 나누다면, 90이라는 정수값을 결과로 얻게 된다. 정수형간의 연산에서는 반올림이 이루어지지 않는다.
+
+예제 9-20 / ch9 / MathEx1.java
+
+``` java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+public class MathEx1 {
+	public static void main(String[] args) {
+		double val = 90.7552;
+		out.println("round(" + val + ") = " + round(val));	// 반올림
+		
+		val *= 100;
+		out.println("round(" + val + ") = " + round(val));	// 반올림
+		
+		out.println("round(" + val + ") / 100 = " + round(val) / 100);	// 반올림
+		out.println("round(" + val + ") / 100.0 = " + round(val) / 100.0);	// 반올림
+		out.println();
+		out.printf("ceil(%3.1f) = %3.1f%n", 1.1, ceil(1.1));	// 올림
+		out.printf("floor(%3.1f) = %3.1f%n", 1.1, floor(1.1));	// 버림
+		out.printf("round(%3.1f) = %d%n", 1.1, round(1.1));	// 반올림
+		out.printf("round(%3.1f) = %d%n", 1.5, round(1.5));	// 반올림
+		out.printf("rint(%3.1f) = %f%n", 1.5, rint(1.5));	// 반올림
+		out.printf("round(%3.1f) = %d%n", -1.5, round(-1.5));	// 반올림
+		out.printf("rint(%3.1f) = %f%n", -1.5, rint(-1.5));	// 반올림
+		out.printf("ceil(%3.1f) = %f%n", -1.5, ceil(-1.5));	// 올림
+		out.printf("floor(%3.1f) = %f%n", -1.5, floor(-1.5));	// 버림
+	}
+}
+```
+
+```
+round(90.7552) = 91
+round(9075.52) = 9076
+round(9075.52) / 100 = 90
+round(9075.52) / 100.0 = 90.76
+
+ceil(1.1) = 2.0
+floor(1.1) = 1.0
+round(1.1) = 1
+round(1.5) = 2
+rint(1.5) = 2.000000
+round(-1.5) = -1
+rint(-1.5) = -2.000000
+ceil(-1.5) = -1.000000
+floor(-1.5) = -2.000000
+```
+
+`Math`클래스에 속한 메소드들을 활용하는 예제이다. 코드를 간단히 하기 위해 정적 import문을 추가했다.
+
+``` java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+```
+
+`rint()`도 `round()`처럼 소수점 첫 째자리에서 반올림하지만, 반환값이 double이다.
+
+``` java
+out.printf("round(%3.1f) = %d%n", 1.5, round(1.5));	// 반환값이 int
+out.printf("rint(%3.1f) = %f%n", 1.5, rint(1.5));	// 반환값이 double
+```
+
+그리고 `rint()`는 두 정수의 정가운데 있는 값은 가장 가까운 짝수 정수를 반환한다.
+
+``` java
+out.printf("round(%3.1f) = %d%n", -1.5, round(-1.5));	// -1
+out.printf("rint(%3.1f) = %f%n", -1.5, rint(-1.5));	// -2.0
+```
+
+`round()`는 소수점 첫째자리가 5일 떄, 더 큰 값으로 반올림하니까 -1이 되지만, `rint()`는 -1.5와 같이 홀수(-1.0)와 짝수(-2.0)의 딱 중간에 있는 경우 짝수(-2.0)를 결과로 반환한다. 그리고 음수에서는 양수와 달리 -1.5를 버림(floor)하면 -2.0이 된다.
+
+``` java
+out.printf("ceil(%3.1f) = %f%n", -1.5, ceil(-1.5));	// -1.0
+out.printf("floor(%3.1f) = %f%n", -1.5, floor(-1.5));	// -2.0
+```
+
+</br>
+
+### 예외를 발생시키는 메소드
+
+메소드 이름에 `Exact`가 포함된 메소드들이 JDK1.8부터 새로 추가되었다. 이들은 정수형간의 연산에서 발생할 수 있는 오버플로우(overflow)를 감지하기 위한 것이다.
+
+``` java
+int addExact(int x, int y)	// x + y
+int subtractExact(int x, int y)	// x - y
+int multiplyExact(int x, int y)	// x * y
+int incrementExact(int a)	// a++
+int decrementExact(int a)	// a--
+int negateExact(int a)	// -a
+int toIntExact(long value)	// (int)value = int로의 형변환
+```
+
+연산자는 단지 결과를 반환할 뿐, 오버플로우의 발생여부에 대해 알려주지 않는다. 그러나 위의 메소드들은 오버플로우가 발생하면, 예외(ArithmeticException)를 발생시킨다.
+
+예제 9-27 / ch9 / MathEx2.java
+
+``` java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+public class MathEx2 {
+	public static void main(String[] args) {
+		int i = Integer.MIN_VALUE;
+		
+		out.println("i = " + i);
+		out.println("-i = " + (-i));
+		
+		try {
+			out.printf("negateExact(%d) = %d%n", 10, negateExact(10));
+			out.printf("negateExact(%d) = %d%n", -10, negateExact(-10));
+			out.printf("negateExact(%d) = %d%n", i, negateExact(i));	// 예외 발생
+		} catch (ArithmeticException e) {
+			// i를 long타입으로 형변환 다음에 negateExact(long a)를 호출
+			out.printf("negateExact(%d) = %d%n", (long)i, negateExact((long)i));
+		}
+	}	// main의 끝
+}
+```
+
+```
+i = -2147483648
+-i = -2147483648
+negateExact(10) = -10
+negateExact(-10) = 10
+negateExact(-2147483648) = 2147483648
+```
+
+변수 `i`에 int타입의 최소값인 `Integer.MIN_VALUE`를 저장한 다음에, 부호연산자로 `i`의 부호를 반대로 바꾸었다. 그런데, 실행결과에서 `-i`의 값을 보면 부호가 바뀌지 않고 `i`의 값 그대로이다. 정수형의 최소값에 비트전환연산자`~`를 적용하면, 최대값이 되는데 여기에 1을 더하니까 오버플로우가 발생한다.
+
+![image](https://ifh.cc/g/Dm6dgd.png)
+
+그래서 int의 최소값이 다시 원래의 값이 되어버렸다. 예제에서는 try-catch문을 사용해서 오버플로우가 발생하면, `i`를 long타입으로 형변환하여 `negateExact(long a)`를 호출하도록 작성하였다.
+
+실행결과를 보면 오버플로우로 인한 예외가 발생했지만, catch블럭에 의해 예외가 처리되어 올바른 결과가 출력된 것을 확인할 수 있다.
+
+</br>
+
+### 삼각함수와 지수, 로그
+
+예제 9-22 / ch9 / MathEx3.java
+
+``` java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+public class MathEx3 {
+	public static void main(String[] args) {
+		int x1 = 1, y1 = 1;	// (1, 1)
+		int x2 = 2, y2 = 2;	// (2, 2)
+		
+		double c = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+		double a = c * sin(PI / 4);	// PI / 4 rad = 45 degree
+		double b = c * cos(PI / 4);
+//		double b = c * cos(toRadians(45));
+		
+		out.printf("a = %f%n", a);
+		out.printf("b = %f%n", b);
+		out.printf("c = %f%n", c);
+		out.printf("angle = %f rad%n", atan2(a, b));
+		out.printf("angle = %f degree%n%n", atan2(a, b) * 180 / PI);
+//		out.printf("angle = %f degree%n%n", toDegrees(atan2(a, b)));
+		out.printf("24 * log10(2) = %f%n", 24 * log10(2));	// 7.224720
+		out.printf("53 * log10(2) = %f%n%n", 53 * log10(2));	// 15.954590
+	}
+}
+```
+
+```
+a = 1.000000
+b = 1.000000
+c = 1.414214
+angle = 0.785398 rad
+angle = 45.000000 degree
+
+24 * log10(2) = 7.224720
+53 * log10(2) = 15.954590
+```
+
+두 점(x1, y1), (x2, y2)간의 거리는 c는 	$\sqrt{(x2-x1)^2+(y2-y1)^2}$로 구할 수 있다.
+
+제곱근을 계산해주는 `sqrt()`와 n제곱을 계산해주는 `pow()`를 사용해서 식을 구성하면 다음과 같다. 
+
+``` java
+double c = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2));
+```
+
+예제에서 `x1`과 `y1`의 값은 1이고, `x2`와 `y2`의 값은 2니까, 이 값들을 대입하면 다음과 같이 계산된다.
+
+``` java
+	double c = sqrt(pow(2-1, 2) + pow(y2-y1, 2));
+→	double c = sqrt(pow(1, 2) + pow(1, 2));	// pow(1, 2)는 1의 2제곱
+→	double c = sqrt(1.0 + 1.0);
+→	double c = sqrt(2.0);
+→	double c = 1.414214;
+```
+
+![image](https://ifh.cc/g/rBXxHL.png)
+
+a와 b를 구하는 수학공식은 위와 같으며, 이 공식을 자바로 작성하면 다음과 같다.
+
+> Math클래스에는 원주율 PI와 자연로그의 밑인 E가 상수로 정의되어 있다.
+
+``` java
+	double a = c * sin(PI / 4);	// PI / 4 rad = 45 degree
+	double b = c * cos(PI / 4);
+//	double b = c * cos(toRadians(45));	// 각도를 라디안을 변환
+```
+
+삼각함수는 매겨변수의 단위가 '라디안(radian)'이므로, 45도를 '라디안(radian)'단위의 값으로 변횐해야 한다. '180˚ * π rad'이므로, '45˚ = π/4 rad'이다. 아니면, `toRadians(double angdeg)`을 이용할 수도 있다. 이 메소드의 반환값은 double이다.
+
+``` java
+	out.printf("angle = %f rad%n", atan2(a, b));
+	out.printf("angle = %f degree%n%n", atan2(a, b) * 180 / PI);
+//	out.printf("angle = %f degree%n%n", toDegrees(atan2(a, b)));
+```
+
+`atan2`메소드는 직각 삼각형에서 두 변의 길이 a, b를 알면 끼인각θ를 구해준다. 이 메소드의 결과값 역시 단위가 라디안이므로 도(degree)단위로 변환하려면 '180/PI'를 곱하거나 `toDegrees(double angrad)`를 이용하면 된다.
+
+25자리의 2진수는 10진수로 몇 자리의 값인지를 알아내려면 다음의 식을 풀어야한다.
+
+2<sup>24</sup> = 10<sup>x</sup>
+
+이 식의 양변에 상용로그(log<sub>10</sub>)를 취하면, 다음과 같은 식이 된다.
+
+24 * log<sub>10</sub>2 = x
+
+이 식은 아래와 같이 계산할 수 있으며, 결과는 약 7.2이다. 즉, 24자리의 2진수는 10진수로 7자리의 값을 표현할 수 있다
+
+``` java
+	out.printf("24 * log10(2) = %f%n", 24 * log10(2));	// 7.224720
+	out.printf("53 * log10(2) = %f%n%n", 53 * log10(2));	// 15.954590
+```
+
+그래서 float타입의 정밀도가 7자리인 것이다. 마찬가지로 double타입의 정밀도는 15자리임을 알 수 있다.
+
+> float타입의 가수는 23자리지만, 정규호를 통해 1자리를 더 확보할 수 있으므로 실제로 저장할 수 있는 가수는 24자리이다. double타입 역시 52 + 1 = 53자리이다.
+
+</br>
+
+### StricMath클래스
+
+`Math`클래스는 최대한의 성능을 얻기 위해 JVM이 설치된 OS의 메소드를 호출해서 사용한다 즉, OS에 의존적인 계산을 하고 있다. 예를 들어 부동소수점 계산의 경우, 반올림의 처리방법 설정이 OS마다 다를 수 있기 때문에 자바로 작성된 프로그램임에도 불구하고 컴퓨터마다 결과가 다를 수 있다.
+
+이러한 차이를 없애기 위해 성능은 다소 포기하는 대신, 어떤 OS에서 실행되어도 항상 같은 결과를 얻도록 `Math`클래스를 새로 작성한 것이 `StricMath`클래스이다.
+
+</br>
+
+### Math클래스의 메소드
+
+![image](https://ifh.cc/g/4zGCXy.png)
