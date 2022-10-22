@@ -574,3 +574,186 @@ result : A drunken hand works, but not a drunken heart
 `Matcher`의 `find()`로 정규식과 일치하는 부분을 찾으면, 그 위치를 `start()`와 `end()`로 알아 낼 수 있고 `appendReplacement(StringBuffer sb, String replacement)`를 이용해서 원하는 문자열(replacement)로 치환할 수 있다. 치환된 결과는 `StringBuffer`인 `sb`에 저장되는데, `sb`에 저장되는 내용을 단계별로 살펴보면 이해하기 쉽다.
 
 ![image](https://ifh.cc/g/DpZDtZ.png)
+
+</br>
+
+## 2.4 java.util.Scanner클래스
+
+`Scanner`는 화면, 파일, 문자여로가 같은 입력소스로부터 문자데이터를 읽어오는데 도움을 줄 목적으로 JDK1.5부터 추가되었다. `Scanner`에는 다음과 같은 생성자를 지원하기 때문에 다양한 입력소스로부터 데이터를 읽을 수 있다.
+
+``` java
+Scanner(String source)
+Scanner(File source)
+Scanner(InputStream source)
+Scanner(Readable source)
+Scanner(ReadableByteChannel source)
+Scanner(Path source)	// JDK1.7부터 추가
+```
+
+또한 `Scanner`는 정규식 표현(Regular expression)을 이용한 라인단위의 검색을 지원하며 구분자(delimiter)에도 정규식 표현을 사용할 수 있어서 복잡한 형태의 구분자도 처리가 가능하다.
+
+``` java
+Scanner useDelimiter(Pattern pattern)
+Scanner useDelimiter(String pattern)
+```
+
+입력받을 값이 숫자라면 `nextLine()`대신 `nextInt()` 또는 `nextLong()`과 같은 메소드를 사용할 수 있다. `Scanner`에서는 이와 같은 메소드를 제공함으로써 입력받은 문자를 다시 변환하는 수고를 덜어 준다.
+
+``` java
+boolean nextBoolean()
+byte nextByte()
+short nextShort()
+int nextInt()
+long nextLong()
+double nextDouble()
+float nextFloat()
+String nextLine()
+```
+
+> 실제 입력된 데이터의 형식에 맞는 메소드를 사용하지 않으면, InputMismatchException이 발생한다.
+
+예제 9-35 / ch9 / ScannerEx1.java
+
+``` java
+import java.util.*;
+
+public class ScaanerEx1 {
+	public static void main(String[] args) {
+		Scanner s = new Scanner(System.in);
+		String[] argArr = null;
+		
+		while(true)	{
+			String prompt = ">>";
+			System.out.print(prompt);
+			
+			// 화면으로부터 라인단위로 입력받는다.
+			String input = s.nextLine();
+			
+			input = input.trim();	// 입력받은 값에서 불필요한 앞뒤 공백을 제거한다.
+			argArr = input.split(" +");	// 입력받은 내용을 공백을 구분자로 자른다.
+			
+			String command = argArr[0].trim();
+			
+			if("".equals(command))	continue;
+			
+			// 명령어를 소문자로 바꾼다.
+			command = command.toLowerCase();
+			
+			// q 또는 Q를 입력하면 실행종료한다.
+			if(command.equals("q")) {
+				System.exit(0);
+			} else {
+				for(int i = 0; i < argArr.length; i++) {
+					System.out.println(argArr[i]);
+				}
+			}
+		}	// while(true)
+	}	// main
+}
+```
+
+```
+>>hello
+hello
+>>hello   123
+hello
+123
+>>hello 123 456
+hello
+123
+456
+>>
+>>q
+```
+
+화면으로부터 라인단위로 입력받아서 입력받은 내용을 공백을 구분자로 나눠서 출력하는 예제이다. 입력받은 라인의 단어는 공백이 여러 개 일 수 있으므로 정규식을 " +"로 하였다. 이 정규식의 의미는 하나 이상의 공백을 의미한다.
+
+``` java
+argArr = input.split(" +");	// 입력받은 내용을 공백을 구분자로 자른다.
+```
+
+예제 9-36 / ch9 / ScannerEx2.java
+
+``` java
+import java.util.Scanner;
+import java.io.File;
+
+public class ScannerEx2 {
+	public static void main(String[] args) throws Exception {
+		Scanner sc = new Scanner(new File("data2.txt"));
+		int sum = 0;
+		int cnt = 0;
+		
+		while(sc.hasNextInt()) {
+			sum += sc.nextInt();
+			cnt++;
+		}
+		
+		System.out.println("sum = " + sum);
+		System.out.println("average = " + (double)sum / cnt);
+	}
+}
+```
+
+```
+c:\jdk1.8\work\ch9>java ScannerEx2
+sum = 1500
+average = 300.0
+
+c:\jdk1.8\work\ch9>type data2.txt
+100
+200
+300
+400
+500
+```
+
+data2.txt파일로부터 데이터를 읽어서 합과 평균을 계산하는 예제이다. 여기서는 data2.txt파일이 예제소스파일인 ScannerEx2.java와 같은 디렉토리에 있어서 경로없이 파일명만 지정해주었지만 소스파일과 다른 디렉토리에 위치한 파일을 읽기 위해서는 파일명에 경로도 함께 지정해주어야 한다.
+
+예제 9-37 / ch9 / ScannerEx3.java
+
+``` java
+import java.util.Scanner;
+import java.io.File;
+
+public class ScannerEx3 {
+	public static void main(String[] args) throws Exception {
+		Scanner sc = new Scanner(new File("data3.txt"));
+		int cnt = 0;
+		int totalSum = 0;
+		
+		while(sc.hasNextLine()) {
+			String line = sc.nextLine();
+			Scanner sc2 = new Scanner(line).useDelimiter(",");
+			int sum = 0;
+			
+			while(sc2.hasNextInt()) {
+				sum += sc2.nextInt();
+			}
+			System.out.println(line + ", sum = " + sum);
+			totalSum += sum;
+			cnt++;
+		}
+		System.out.println("Line : " + cnt + ", Total : " + totalSum);
+	}
+}
+```
+
+```
+c\:jdk1.8\work\ch9>java ScannerEx3
+100,100,100, sum = 300
+200,200,200, sum = 600
+300,300,300, sum = 900
+400,400,400, sum = 1200
+500,500,500, sum = 1500
+Line : 5, Total : 4500
+
+c:\jdk1.8\work\ch9>type data3.txt
+100,100,100
+200,200,200
+300,300,300
+400,400,400
+500,500,500
+```
+
+이전 예제와 같이 파일로부터 데이터를 읽어서 계산하는 예제인데 이전과는 달리 ','를 구분자로 한 라인에 여러 데이터가 저장되어 있다. 이럴 때는 파일의 내용을 먼저 라인별로 읽은 다음에 다시 ','를 구분자로 하는 `Scanner`를 이용해서 각각의 데이터를 읽어야 한다.
