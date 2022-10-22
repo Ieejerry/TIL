@@ -757,3 +757,248 @@ c:\jdk1.8\work\ch9>type data3.txt
 ```
 
 이전 예제와 같이 파일로부터 데이터를 읽어서 계산하는 예제인데 이전과는 달리 ','를 구분자로 한 라인에 여러 데이터가 저장되어 있다. 이럴 때는 파일의 내용을 먼저 라인별로 읽은 다음에 다시 ','를 구분자로 하는 `Scanner`를 이용해서 각각의 데이터를 읽어야 한다.
+
+</br>
+
+## 2.5 java.util.StringTokenizer클래스
+
+`StringTokenizer`는 긴 문자열을 지정된 구분자(delimiter)를 기준으로 토큰(token)이라는 여러 개의 문자열로 잘라내는 데 사용한다. 예를 들어 "100,200,300,400"이라는 문자열이 있을 때 ','를 구분자로 잘라내면 "100", "200", "300", "400"이라는 4개의 문자열(토큰)을 얻을 수 있다.
+
+`StringTokenizer`를 이용하는 방법 이외에도 아래와 같이 `String`의 `split(String regex)`이나 `Scanner`의 `useDelimiter(String pattern)`를 사용할 수는 있지만,
+
+``` java
+String[] result = "100,200,300,400".split(",");
+Scanner sc2 = new Scanner("100,200,300,400").useDelimiter(",");
+```
+
+이 두 가지 방법은 정규식 표현(Regular expression)을 사용해야하므로 정규식 표현에 익숙하지 않은 경우 `StringTokenizer`를 사용하는 것이 간단하면서도 명확한 결과를 얻을 수 있다.
+
+그러나 `StringTokenizer`는 구분자로 단 하나의 문자 밖에 사용하지 못하기 때문에 보다 복잡한 형태의 구분자로 문자열을 나누어야 할 때는 어쩔 수 없이 정규식을 사용하는 메소드를 사용해야 한다.
+
+</br>
+
+### StringTokenizer의 생성자와 메소드
+
+`StringTokenizer`의 주로 사용되는 생성자와 메소드는 다음과 같다.
+
+![image](https://ifh.cc/g/JRmPjx.png)
+
+예제 9-38 / ch9 / StringTokenizerEx1.java
+
+``` java
+import java.util.*;
+
+public class StringTokenizerEx1 {
+	public static void main(String[] args) {
+		String source = "100,200,300,400";
+		StringTokenizer st = new StringTokenizer(source, ",");
+		
+		while(st.hasMoreTokens()) {
+			System.out.println(st.nextToken());
+		}
+	} // main의 끝
+}
+```
+
+```
+100
+200
+300
+400
+```
+
+','를 구분자로 하는 `StringTokenizer`를 생성해서 문자열(source)을 나누어 출력하는 예제이다.
+
+예제 9-39 / ch9 / StringTokenizerEx2.java
+
+``` java
+import java.util.*;
+
+public class StringTokenizerEx2 {
+	public static void main(String[] args) {
+		String expression = "x=100*(200+300)/2";
+		StringTokenizer st = new StringTokenizer(expression, "+-*/=()", true);
+		
+		while(st.hasMoreTokens()) {
+			System.out.println(st.nextToken());
+		}
+	}	// main의 끝
+}
+```
+
+```
+x
+=
+100
+*
+(
+200
++
+300
+)
+/
+2
+```
+
+생성자 `StringTokenizer(String str, String delim, boolean returnDelims)`를 사용해서 구분자도 토큰으로 간주되도록 하였다.
+
+``` java
+StringTokenizer st = new StringTokenizer(expression, "+-*/=()", true);
+```
+
+`StringTokenizer`는 단 한 문자의 구분자만 사용할 수 있기 때문에, "+-*/=()"가 전체가 하나의 구분자가 아니라 각각의 문자가 모두 구분자라는 것이다.
+
+> 만일 구분자가 두 문자 이상이라면, Scanner나 String클래스의 split메소드를 사용해야 한다.
+
+예제 9-40 / ch9 / StringTokenizerEx3.java
+
+``` java
+import java.util.*;
+
+public class StringTokenizerEx3 {
+	public static void main(String[] args) {
+		String source = "1,김천재,100,100,100|2,박수재,95,80,90|3,이자바,80,90,90";
+		StringTokenizer st = new StringTokenizer(source, "|");
+		
+		while(st.hasMoreTokens()) {
+			String token = st.nextToken();
+			
+			StringTokenizer st2 = new StringTokenizer(token, ",");
+			while(st2.hasMoreTokens()) {
+				System.out.println(st2.nextToken());
+			}
+			System.out.println("-------");
+		}
+	}	// main
+}
+```
+
+```
+1
+김천재
+100
+100
+100
+-------
+2
+박수재
+95
+80
+90
+-------
+3
+이자바
+80
+90
+90
+-------
+```
+
+문자열에 포함된 데이터가 두 가지 종류의 구분자로 나뉘어져 있을 때 두 개의 `StringTokenizer`와 이중 반복문을 사용해서 처리하는 방법을 보여주는 예제이다. 한 학생의 정보를 구분하기위해 "|"를 사용하였고, 학생의 이름과 점수 등을 구분하기 위해 ","를 사용하였다.
+
+예제 9-41 / ch9 / StringTokenizerEx4.java
+
+``` java
+import java.util.*;
+
+public class StringTokenizerEx4 {
+	public static void main(String[] args) {
+		String input = "삼십만삼천백십오";
+		System.out.println(input);
+		System.out.println(hagulToNum(input));
+	}
+	
+	public static long hagulToNum(String input) {	// 한글을 숫자로 바꾸는 메소드
+		long result = 0;	// 최종 변환결과를 저장하기 위한 변수
+		long tmpResult = 0;	// 십백천 단위의 값을 저장하기 위한 임시변수
+		long num = 0;
+		
+		final String NUMBER = "영일이삼사오육칠팔구";
+		final String UNIT = "십백천만억조";
+		final long[] UNIT_NUM = {10,100,1000,10000,(long)1e8,(long)1e12};
+		
+		StringTokenizer st = new StringTokenizer(input, UNIT, true);
+		
+		while(st.hasMoreTokens()) {
+			String token = st.nextToken();
+			int check = NUMBER.indexOf(token);	// 숫자인지, 단위(UNIT)인지 확인한다.
+			
+			if(check==-1) {	// 단위인 경우
+				if("만억조".indexOf(token)==-1) {
+					tmpResult += (num!=0 ? num : 1) * UNIT_NUM[UNIT.indexOf(token)];
+				} else {
+					tmpResult += num;
+					result += (tmpResult!=0 ? tmpResult : 1)*UNIT_NUM[UNIT.indexOf(token)];
+					tmpResult = 0;
+				}
+				num = 0;
+			} else {	// 숫자인 경우
+				num = check;
+			}
+		}	// end of while
+		
+		return result + tmpResult + num;
+	}
+}
+```
+
+```
+삼십만삼천백십오
+303115
+```
+
+한글로 된 숫자를 아리비아 숫자로 변환하는 예제이다.
+
+먼저 `tmpResult`는 "만억조"와 같은 큰 단위가 나오기 전까지 "십백천"단위의 값을 저장하는 임시공간이고, `reuslt`는 실제 결과 값을 저장하기 위한 공간이다.
+
+한글로 된 숫자를 구분자(단위)로 잘라서, 토큰이 숫자면 `num`에 저장하고 단위면 `num`에다 단위(UNIT_NUM배열 중의 한 값)를 곱해서 `tmpResult`에 저장한다. 예를 들어 "삼십"이면 '3 * 10 = 30'이 되어 30이 `tmpReuslt`에 저장된다.
+
+그리고 "만삼천"과 같이 숫자 없이 바로 단위로 시작하는 경우에는 `num`의 값이 0이기 때문에 단위의 값을 곱해도 그 결과가 0이 됨으로 삼항 연산자를 이용해서 `num`의 값을 1로 바꾼 후 단위값을 곱하도록 하였다.
+
+``` java
+result += (tmpResult!=0 ? tmpResult : 1)*UNIT_NUM[UNIT.indexOf(token)];
+```
+
+그 다음에 "만억조"와 같이 큰 단위가 나오면 `tmpResult`에 저장된 값에 큰 단위 값을 곱해서 `result`에 저장하고 `tmpResult`는 0으로 초기화 한다. 예를 들어 "삼십만"은 `tmpResult`에 저장되어 있던 30에 10000을 곱해서 `result`에 저장하고, `tmpResult`는 0으로 초기화 한다.
+
+``` java
+tmpResult += num;
+result += (tmpResult != 0 ? tmpResult : 1) * UNIT_NUM(UNIT.indexOf(token));
+tmpResult = 0;
+```
+
+예제 9-42 / ch9 / StringTokenizerEx5.java
+
+``` java
+import java.util.*;
+
+public class StringTokenizerEx5 {
+	public static void main(String[] args) {
+		String data = "100,,,200,300";
+		
+		String[] result = data.split(",");
+		StringTokenizer st = new StringTokenizer(data, ",");
+		
+		for(int i = 0; i < result.length; i++) {
+			System.out.print(result[i] + "|");
+		}
+		
+		System.out.println("개수 : " + result.length);
+		
+		int i = 0;
+		for(; st.hasMoreTokens(); i++) {
+			System.out.print(st.nextToken() + "|");
+		}
+		System.out.println("개수 : " + i);
+	}	// main
+}
+```
+
+```
+100|||200|300|개수 : 5
+100|200|300|개수 : 3
+```
+
+구분자를 ','로 하는 문자열 데이터를 `String`클래스의 `split()`과 `StringTokenizer`로 잘라낸 결과를 비교하는 예제이다. 실행결과를 보면, `split()`은 빈 문자열도 토큰으로 인식하는 반면 `StringTokenizer`는 빈 문자열을 토큰으로 인식하지 않기 때문에 인식하는 토큰의 개수가 서로 다른 것을 알 수 있다.
+
+이 외에도 성능의 차이가 있는데, `split()`은 데이터를 토큰으로 잘라낸 결과를 배열에 담아서 변환하기 때문에 데이터를 토큰으로 바로바로 잘라서 반환하는 `StringTokenizer`보다 성능이 떨어질 수밖에 없다.
