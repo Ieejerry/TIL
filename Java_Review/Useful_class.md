@@ -1002,3 +1002,162 @@ public class StringTokenizerEx5 {
 구분자를 ','로 하는 문자열 데이터를 `String`클래스의 `split()`과 `StringTokenizer`로 잘라낸 결과를 비교하는 예제이다. 실행결과를 보면, `split()`은 빈 문자열도 토큰으로 인식하는 반면 `StringTokenizer`는 빈 문자열을 토큰으로 인식하지 않기 때문에 인식하는 토큰의 개수가 서로 다른 것을 알 수 있다.
 
 이 외에도 성능의 차이가 있는데, `split()`은 데이터를 토큰으로 잘라낸 결과를 배열에 담아서 변환하기 때문에 데이터를 토큰으로 바로바로 잘라서 반환하는 `StringTokenizer`보다 성능이 떨어질 수밖에 없다.
+
+</br>
+
+## 2.6 java.math.BigInteger클래스
+
+정수형으로 표현할 수 잇는 값의 한계가 있다. 가장 큰 정수형 타입인 long으로 표현할 수 있는 값은 10진수로 19자리 정도이다. 이 값도 상당히 큰 값이지만, 과학적 계산에서는 더 큰 값을 다뤄야할 때가 있다. 그럴 때 사용하면 좋은 것이 `BigInteger`이다.
+
+`BigInteger`는 내부적으로 int배열을 사용해서 값을 다룬다. 그래서 long타입보다 훨씬 큰 값을 다룰 수 있는 것이다. 대신 성능은 long타입보다 떨어질 수밖에 없다.
+
+``` java
+final int signum;	// 부호. 1(양수), 0, -1(음수) 셋 중의 하나
+final int[] mag;	// 값(magnitude)
+```
+
+위의 코드에서 알 수 있듯이, `BigInteger`는 `String`처럼 불변(immutable)이다. 그리고 모든 정수형이 그렇듯이 `BigInteger` 역시 값을 '2의 보수'의 형태로 표현한다.
+
+위의 코드에서 알 수 있드싱 부호를 따로 저장하고 배열에는 값 자체만 저장한다. 그래서 `signum`의 값이 -1, 즉 음수인 경우, 2의 보수법에 맞게 `mag`의 값을 변환해서 처리한다. 그래서 부호만 다른 두 값의 `mag`는 같고 `signum`은 다르다.
+
+</br>
+
+### BigInteger의 생성
+
+`BigInteger`를 생성하는 방법은 여러 가지가 있는데, 문자열로 숫자를 표현하는 것이 일반적이다. 정수형 리터럴로는 표현할 수 있는 값의 한계가 있기 때문이다.
+
+``` java
+BigInteger val;
+val = new BigInteger("12345678901234567890");	// 문자열로 생성
+val = new BigInteger("FFFF", 16);	// n진수(radix)의 문자열로 생성
+val = BigInteger.valueOf(123456890L);	// 숫자로 생성
+```
+
+</br>
+
+### 다른 타입으로의 변환
+
+`BigInteger`를 문자열, 또는 byte배열로 변환하는 메소드는 다음과 같다.
+
+``` java
+String toString()	// 문자열로 변환
+String toSTring(int radix)	// 지정된 진법(radix)의 문자열로 변환
+byte[] toByteArray()	// byte배열로 변환
+```
+
+`BigInteger`도 `Number`로부터 상속받은 기본형으로 변환하는 메소드들을 가지고 있다.
+
+``` java
+int intValue()
+long longValue()
+float floatValue()
+double doubleValue()
+```
+
+정수형으로 변환하는 메소드 중에서 이름 끝에 `Exact`가 붙은 것들은 변환한 결과가 변환한 타입의 범위에 속하지 않으면 `ArithmeticException`을 발생시킨다.
+
+``` java
+byte byteValueExact()
+int intValueExact()
+long longValueExact()
+```
+
+</br>
+
+### BigInteger의 연산
+
+`BigInteger`에는 정수형에 사용할 수 있는 모든 연산자와 수학적인 계산을 쉽게 해주는 메소드들이 정리되어 있다.
+
+> remainder와 mod는 둘 다 나머지를 구하는 메소드지만, mod는 나누는 값이 음수면 ArithmeticException을 발생시킨다는 점이 다르다.
+
+``` java
+BigInteger add(BigInteger val)			// 덧셈(this + val)
+BigInteger subtract(BigInteger val)		// 뺄셈(this - val)
+BigInteger multiply(BigInteger val)		// 곱셈(this * val)
+BigInteger divide(BigInteger val)		// 나눗셈(this / val)
+BigInteger remainder(BigInteger val)	// 나머지(this % val)
+```
+
+`BigInteger`는 불변이므로, 반환타입이 `BigInteger`란 얘기는 새로운 인스턴스가 반환된다. Java API를 보면, 메소드마다 연산기호가 적혀있기 때문에, 각 메소드가 어떤 연산자를 구현한 것인지 알 수 있다.
+
+</br>
+
+### 비트 연산 메소드
+
+워낙 큰 숫자를 다루기 위한 클래스이므로, 성능을 향상시키기 위해 비트단위로 연산을 수행하는 메소드들을 많이 가지고 있다. and, or, xor, not과 같이 비트연산자를 구현한 메소드들은 물론이고 다음과 같은 메소드들도 제공한다.
+
+``` java
+int bitCount()	// 2진수로 표현했을 때, 1의 개수(음수는 0의 개수)를 반환
+int bitLength()	// 2진수로 표현했을 때, 값을 표현하는데 필요한 bit수
+boolean testBit(int n)	// 우측에서 n+1번째 비트가 1이면 true, 0이면 false
+BigInteger setBit(int n)	// 우측에서 n+1번째 비트를 1로 변경
+BigInteger clearBit(int n)	// 우측ㅇ서 n+1번째 비트를 0으로 변경
+BigInteger flipBit(int n)	// 우측ㅇ서 n+1번째 비트를 전환(1→0, 0→1)
+```
+
+>  n의 값은 배열의 index처럼 0부터 시작하므로, 우측에서 첫 번째 비트는 n이 0이다.
+
+정수가 짝수인지 확인할 때, 정수를 2로 나머지 연산한 결과 0인지 확인하는 조건식을 작성하였다. `BigInteger`의 경우에도 같은 식으로 작성하면 꽤 복잡해진다.
+
+``` java
+BigInteger bi = new BigInteger("4");
+if(bi.remainder(new BigInteger("2")).equals(BigInteger.ZERO)) {
+	...
+```
+
+대신 짝수는 제일 오른쪽 비트가 0일 것이므로, `testBit(0)`으로 마지막 비트를 확인하는 것이 더 효율적이다.
+
+``` java
+BigInteger bi = new BigInteger("4");
+if(!bi.testBit(0)) {	// if(bi.testBit(0) == false) {
+	...
+```
+
+예제 9-43 / ch9 / BigIntegerEx.java
+
+``` java
+import java.math.*;
+
+public class BigIntegerEx {
+	public static void main(String[] args) throws Exception {
+		for(int i = 0; i < 100; i++) {	// 1!부터 99!까지 출력
+			System.out.printf("%d != %s%n", i, calcFactorial(i));
+		}
+		Thread.sleep(300);	// 0.3초의 지연
+	}
+	
+	static String calcFactorial(int n) {
+		return factorial(BigInteger.valueOf(n)).toString();
+	}
+	
+	static BigInteger factorial(BigInteger n) {
+		if(n.equals(BigInteger.ZERO))
+			return BigInteger.ONE;
+		else // return n * factorial(n-1);
+			return n.multiply(factorial(n.subtract(BigInteger.ONE)));
+	}
+}
+```
+
+```
+0 != 1
+1 != 1
+2 != 2
+3 != 6
+4 != 24
+5 != 120
+6 != 720
+7 != 5040
+8 != 40320
+9 != 362880
+...
+98 != 9426890448883247745626185743057242473809693764078951663494238777294707070023223798882976159207729119823605850588608460429412647567360000000000000000000000
+99 != 933262154439441526816992388562667004907159682643816214685929638952175999932299156089414639761565182862536979208272237582511852109168640000000000000000000000
+```
+
+1!~99!까지 출력하는 예제이다. long타입으로는 20!까지밖에 계산할 수 없지만, `BigInteger`로는 99!까지, 그 이상도 얼마든지 가능하다. `BigInteger`의 최대값은 ±2의 `Integer.MAX_VALUE`제곱인데, 10진수로는 10의 6억 제곱이다.
+
+``` java
+// 6.464569929448805E8
+System.out.println(Math.long10(2) * Integer.MAX_VALUE);
+```
