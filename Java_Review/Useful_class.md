@@ -401,3 +401,176 @@ public class RandomEx4 {
 데이터베이스에 넣을 테스트 데이터를 만드는 예제이다. 지금까지는 연속적인 범위 내에서 값을 얻어왔지만, 때로는 이 예제와 같이 불연속적인 범위에 있는 값을 임의로 얻어 와야 하는 경우도 있다.
 
 이런 경우 불연속적인 값을 배열에 저장한 후, 배열의 index를 임의로 얻어서 배열에 저장된 값을 읽어오도록 하면 된다.
+
+</br>
+
+## 2.3 정규식(Regular Expression) - java.util.regex패키지
+
+정규식이란 텍스트 데이터 중에서 원하는 조건(패턴, pattern)과 일치하는 문자열을 찾아내기 위해 사용하는 것으로 미리 정의된 기호와 문자를 이용해서 작성한 문자열을 말한다.
+
+정규식을 이용하면 많은 양의 텍스트 파일 중에서 원하는 데이터를 손쉽게 뽑아낼 수도 있고 입력된 데이터가 형식에 맞는지를 체크할 수도 있다. 예를 들면 html문서에서 전화번호나 이멩리 주소만을 따로 추출한다던가, 입력한 비밀번호가 숫자와 영문자의 조합으로 되어 있는지 확인할 수도 있다.
+
+예제 9-31 / ch9 / RegularEx1.java
+
+``` java
+import java.util.regex.*;	// Pattern과 Matcher가 속한 패키지
+
+public class RegularEx1 {
+	public static void main(String[] args) {
+		String[] data = {"bat", "baby", "bonus", "cA", "ca", "co", "c.", "c0", "car", "combat", "count", "date", "disc"};
+		Pattern p = Pattern.compile("c[a-z]*");	// c로 시작하는 소문자영단어
+		
+		for(int i = 0; i < data.length; i++) {
+			Matcher m = p.matcher(data[i]);
+			if(m.matches())
+				System.out.print(data[i] + ",");
+		}
+	}
+}
+```
+
+```
+ca,co,car,combat,count,
+```
+
+`data`라는 문자열배열에 담긴 문자열 중에서 지정한 정규식과 일치하는 문자열을 출력하는 예제이다. `Pattern`은 정규식을 정의하는데 사용되고 `Matcher`는 정규식(패턴)을 데이터와 비교하는 역할을 한다. 정규식을 정의하고 데이터를 비교하는 과정을 단계별로 설명하면 다음과 같다.
+
+![image](https://ifh.cc/g/rB8Lsj.png)
+
+> CharSequence는 인터페이스로, 이를 구현한 클래스는 CharBuffer, String, StringBuffer가 있다.
+
+예제 9-32 / ch9 / RegularEx2.java
+
+``` java
+import java.util.regex.*;	// Pattern과 Matcher가 속한 패키지
+
+public class RegularEx2 {
+	public static void main(String[] args) {
+		String[] data = {"bat", "baby", "bonus", "cA", "ca", "co",
+				"c.", "c0", "c#", "car", "combat", "count", "date", "disc"};
+		
+		String[] pattern = {".*", "c[a-z]*", "c[a-z]", "c[a-zA-Z]",
+				"c[a-zA-Z0-9]", "c.", "c.*", "c\\.", "c\\w", "c\\d",
+				"c.*t", "[b|c].*", ".a.*", ".*a.+", "[b|c].{2}" };
+		
+		for(int x = 0; x < pattern.length; x++) {
+			Pattern p = Pattern.compile(pattern[x]);
+			System.out.print("Pattern : " + pattern[x] + " 결과 : ");
+			for(int i = 0; i < data.length; i++) {
+				Matcher m = p.matcher(data[i]);
+				if(m.matches())
+					System.out.print(data[i] + ",");
+			}
+			System.out.println();
+		}
+	}	// public static void main(String[] args)
+}
+```
+
+```
+Pattern : .* 결과 : bat,baby,bonus,cA,ca,co,c.,c0,c#,car,combat,count,date,disc,
+Pattern : c[a-z]* 결과 : ca,co,car,combat,count,
+Pattern : c[a-z] 결과 : ca,co,
+Pattern : c[a-zA-Z] 결과 : cA,ca,co,
+Pattern : c[a-zA-Z0-9] 결과 : cA,ca,co,c0,
+Pattern : c. 결과 : cA,ca,co,c.,c0,c#,
+Pattern : c.* 결과 : cA,ca,co,c.,c0,c#,car,combat,count,
+Pattern : c\. 결과 : c.,
+Pattern : c\w 결과 : cA,ca,co,c0,
+Pattern : c\d 결과 : c0,
+Pattern : c.*t 결과 : combat,count,
+Pattern : [b|c].* 결과 : bat,baby,bonus,cA,ca,co,c.,c0,c#,car,combat,count,
+Pattern : .a.* 결과 : bat,baby,ca,car,date,
+Pattern : .*a.+ 결과 : bat,baby,car,combat,date,
+Pattern : [b|c].{2} 결과 : bat,car,
+```
+
+자주 쓰일 만한 패턴들을 만들어서 테스트하고 그 결과를 정리하였다. 이 패턴들을 이해하고 나면 정규식에 사용되는 다른 기호를 사용하는 방법도 이해하기 쉽다.
+
+![image](https://ifh.cc/g/jwX3tg.png)
+
+예제 9-33 / ch9 / RegularEx3.java
+
+``` java
+import java.util.regex.*;	// Pattern과 Matcher가 속한 패키지
+
+public class RegularEx3 {
+	public static void main(String[] args) {
+		String source = "HP:011-1111-1111, HOME:02-999-9999 ";
+		String pattern = "(0\\d{1,2})-(\\d{3,4})-(\\d{4})";
+		
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(source);
+		
+		int i = 0;
+		while(m.find()) {
+			System.out.println( ++i + ": " + m.group() + " -> " + m.group(1)
+									+ ", " + m.group(2) + ", " + m.group(3));
+		}
+	}	// main의 끝
+}
+```
+
+```
+1: 011-1111-1111 -> 011, 1111, 1111
+2: 02-999-9999 -> 02, 999, 9999
+```
+
+정규식의 일부를 괄호로 나누어 묶어서 그룹화(grouping)할 수 있다. 그룹회된 부분은 하나의 단위로 묶이는 셈이 되어서 한 번 또는 그 이상의 반복을 의미하는 '+'나 '*'가 뒤에 오면 그룹화된 부분이 적용대상이 된다. 그리고 그룹화된 부분은 `group(int i)`를 이용해서 나누어 얻을 수 있다.
+
+위의 예제에서 `(0\\d{1,2})-(\\d{3,4})-(\\d{4})`은 괄호를 이용해서 정규식을 세 부분으로 나누었는데 예제와 결과에서 알 수 있듯이 매칭되는 문자열에서 첫 번째 그룹은 `group(1)`로 두 번째 그룹은 `group(2)`와 같이 호출함으로써 얻을 수 있다. `group()` 또는 `group(0)`은 그룹으로 매칭된 문자열을 전체를 나누어지지 않은 채로 반환한다.
+
+> group(int i)를 호출할 때 i가 실제 그룹의 수보다 많으면 java.lang.IndexOutOfBoundsException이 발생한다.
+
+![image](https://ifh.cc/g/mplh68.png)
+
+`find()`는 주어진 소스 내에서 패턴과 일치하는 부분을 찾아내면 true를 반환하고 찾지 못하면 false를 반환한다. `find()`를 호출해서 패턴과 일치하는 부분을 찾아낸 다음, 다시 `find()`를 호출하면 이전에 발견한 패턴과 일치하는 부분의 다음부터 다시 패턴매칭을 시작한다.
+
+``` java
+Matcher m = p.matcher(source);
+while(m.find()) {	// find()는 일치하는 패턴이 없으면 false를 반환한다.
+	System.out.println(m.group());
+}
+```
+
+예제 9-34 / ch9 / RegularEx4.java
+
+``` java
+import java.util.regex.*;	// Pattern과 Matcher가 속한 패키지
+
+public class RegularEx4 {
+	public static void main(String[] args) {
+		String source = "A broken hand works, but not a broken heart";
+		String pattern = "broken";
+		StringBuffer sb = new StringBuffer();
+		
+		Pattern p = Pattern.compile(pattern);
+		Matcher m = p.matcher(source);
+		System.out.println("source : " + source);
+		
+		int i = 0;
+		
+		while(m.find()) {
+			System.out.println(++i + "번째 매칭:" + m.start() + "~" + m.end());
+			// broken을 drunken으로 치환하여 sb에 저장한다.
+			m.appendReplacement(sb, "drunken");
+		}
+		
+		m.appendTail(sb);
+		System.out.println("Replacement count : " + i);
+		System.out.println("result : " + sb.toString());		
+	}
+}
+```
+
+```
+source : A broken hand works, but not a broken heart
+1번째 매칭:2~8
+2번째 매칭:31~37
+Replacement count : 2
+result : A drunken hand works, but not a drunken heart
+```
+
+`Matcher`의 `find()`로 정규식과 일치하는 부분을 찾으면, 그 위치를 `start()`와 `end()`로 알아 낼 수 있고 `appendReplacement(StringBuffer sb, String replacement)`를 이용해서 원하는 문자열(replacement)로 치환할 수 있다. 치환된 결과는 `StringBuffer`인 `sb`에 저장되는데, `sb`에 저장되는 내용을 단계별로 살펴보면 이해하기 쉽다.
+
+![image](https://ifh.cc/g/DpZDtZ.png)
