@@ -1161,3 +1161,225 @@ public class BigIntegerEx {
 // 6.464569929448805E8
 System.out.println(Math.long10(2) * Integer.MAX_VALUE);
 ```
+
+</br>
+
+## 2.7 java.math.BigDecimal클래스
+
+double타입으로 표현할 수 있는 값은 상당히 범위가 넓지만, 정밀도가 최대 13자리 밖에 되지 않고 실수형의 특성상 오차를 피할 수 없다. `BigDecimal`은 실수형과 달리 정수를 이용해서 실수를 표현한다. 실수의 오차는 10진 실수를 2진 실수로 정확히 변환할 수 없는 경우가 있기 때문에 발생하는 것이므로, 오차가 없는 2진 정수로 변환하여 다루는 것이다. 실수를 정수와 10의 제곱의 곱으로 표현한다.
+
+![image](https://ifh.cc/g/2MdgXX.png)
+
+scale은 0부터 `Integer.MAX_VALUE`사이의 범위에 있는 값이다. 그리고 `BigDecimal`은 정수를 저장하는데 `BigInteger`를 사용한다.
+
+> BigInteger처럼 BigDecimal도 불변(immutable)이다.
+
+``` java
+private final BigInteger intVal;	// 정수(unscaled value)
+private final int scale;			// 지수(scale)
+private transient int precision;	// 정밀도(precision) - 정수의 자릿수
+```
+
+예를 들어 123.45는 12345 X 10<sup>-2</sup>로 표현할 수 있으며, 이 값이 `BigDecimal`에 저장되면, `intVal`의 값은 12345가 되고 scale의 값은 2가 된다. scale은 소수점 이하의 자리수를 의미한다는 것을 알 수 있다. 그리고 precision의 값은 5가 되는데, 이 값은 정수의 전체 자리수를 의미한다.
+
+``` java
+BigDecimal val = new BigDecimal("123.45");	// 12345x10^-2
+System.out.println(val.unscaleValue());		/ 12345
+System.out.println(val.scale());			// 2
+System.out.println(val.precision());		// 5
+```
+
+</br>
+
+### BigDecimal의 생성
+
+`BigDecimal`를 생성하는 방법은 여러 가지가 있는데, 문자열로 숫자를 표현하는 것이 일반적이다. 기본형 리터럴로는 표현할 수 있는 값의 한계가 있기 때문이다.
+
+``` java
+BigDecimal val;;
+val = new BigDecimal("123.4567890");	// 문자열로 생성
+val = new BigDecimal(123.456);			// double타입의 리터럴로 생성
+val = new BigDecimal(123456);			// int, long타입의 리터럴로 생성가능
+val = BigDecimal.valueOf(123.456);		// 생성자 대신 valueOf(double)를 사용
+val = BigDecimal.valueOf(123456);		// 생성자 대신 valueOf(int)를 사용
+```
+
+그리고 한 가지 주의할 점은, double타입의 값을 매개변수로 갖는 생성자를 사용하면 오차가 발생할 수 있다.
+
+``` java
+System.out.println(new BigDecimal(0.1));	// 0.1000000000000000555111...
+System.out.println(new BigDecimal("0.1"));	// 0.1
+```
+
+</br>
+
+### 다른 타입으로의 변환
+
+`BigDecimal`을 문자열로 변환하는 메소드는 다음과 같다.
+
+``` java
+String toPlainString()	// 어떤 경우에도 다른 기호없이 숫자로만 표현
+String toString()	// 필요하면 지수형태로 표현할 수도 있음
+```
+
+대부분의 경우 이 두 메소드의 반환결과가 같지만, `BigDecimal`을 생성할 때, '1.0e-22'와 같은 지수형태의 리터럴을 사용했을 때 다른 결과를 얻는 경우가 있다.
+
+``` java
+BigDecimal val = new BigDecimal(1.0e-22);
+System.out.println(val.toPlainString());	// 0.00000000000000000000000010...
+System.out.println(val.toString());	// 1.00000000000000000000000048...5E-22
+```
+
+`BigDecimal`도 `Number`로부터 상속받은 기본형으로 변환하는 메소드들을 가지고 있다.
+
+``` java
+int intValue()
+long longValue()
+float floatValue()
+double doubleValue()
+```
+
+`BigDecimal`을 정수형으로 변환하는 메소드 중에서 이름 끝에 `Exact`가 붙은 것들은 변환한 결과가 타입의 범위에 속하지 않으면 ArithmeticException을 발생시킨다.
+
+``` java
+byte byteValueExact()
+short shortValueExact()
+int intValueExact()
+long longValueExact()
+BigInteger toBigIntegerExact()
+```
+
+</br>
+
+### BigDecimal의 연산
+
+`BigDecimal`에는 실수혀에 사용할 수 있는 모든 연산자와 수학적인 계산을 쉽게 해주는 메소드들이 정의되어 있다. 아래는 기본적인 연산을 수행하는 메소드 몇 개만 골라보면 아래와 같다.
+
+``` java
+BigDecimal add(BigInteger val)			// 덧셈(this + val)
+BigDecimal subtract(BigInteger val)		// 뺄셈(this - val)
+BigDecimal multiply(BigInteger val)		// 곱셈(this * val)
+BigDecimal divide(BigInteger val)		// 나눗셈(this / val)
+BigDecimal remainder(BigInteger val)	// 나머지(this % val)
+```
+
+`BigInteger`와 마찬가지로 `BigDecimal`은 불변이므로, 반환타입이 `BigDecimal`인 경우 새로운 인스턴스가 반환된다.
+
+한 가지 알아둬야 할 것은 연산결과의 정수, 지수, 정밀도가 달라진다는 점이다.
+
+``` java						
+											// value, scale, precision
+BigDecimal bd1 = new BigDecimal("123.456");	// 123456,   3,    6
+BigDecimal bd2 = new BigDecimal("1.0");		// 10,       1,    2
+BigDecimal bd3 = bd1.multiply(bd2);			// 1234560,  4,    7
+```
+
+곱셈에서는 두 피연산자의 scale을 더하고, 나눗셈에서는 뺀다. 덧셈과 뺄셈에서는 둘 중에서 자리수가 높은 쪽으로 맞추기 위해서 두 scale중에서 큰 쪽이 결과가 된다.
+
+</br>
+
+### 반올림 모드 - divide()와 setScale()
+
+다른 연산과 달리 나눗셈을 처리하기 위한 메소드는 다음과 같이 다양한 버전이 존재한다. 나눗셈의 결과를 어떻게 반올림(roundingMode)처리할 것인가와, 몇 번째 자리(scale)에서 반올림할 것인지를 지정할 수 있다. `BigDecimal`이 아무리 오차없이 실수를 저장한다고해도 나눗셈에서 발생하는 오차는 어쩔 수 없다.
+
+``` java
+BigDecimal divide(BigDecimal divisor)
+BigDecimal divide(BigDecimal divisor, int roundingMode)
+BigDecimal divide(BigDecimal divisor, RoundingMode roundingMode)
+BigDecimal divide(BigDecimal divisor, int scale, int roundingMode)
+BigDecimal divide(BigDecimal divisor, int scale, RoundingMode roundingMode)
+BigDecimal divide(BigDecimal divisor, MathContext mc)
+```
+
+`roundingMode`는 반올림 처리방법에 대한 것으로 `BigDecimal`에 정의된 `ROUND_`로 시작하는 상수들 중에 하나를 선택해서 사용하면 된다. `RoundingMode`는 이 상수들을 열거형으로 정의한 것으로 나중에 추가되었다.
+
+![image](https://ifh.cc/g/4gj44h.png)
+
+우리가 일반적으로 알고 있는 반올림은 `HALF_UP`이다. 5가 아닌 6을 기준으로 반올림 하는 것이 `HALF_DOWN`이다.
+
+주의해야할 점은 1.0/3.0처럼 `divide()`로 나눗셈한 결과가 무한소수인 경우, 반올림 모드를 지정해주지 않으면 `ArithmeticException`이 발생한다는 것이다.
+
+``` java
+BigDecimal bigd = new BigDecimal("1.0");
+BigDecimal bigd2 = new BigDecimal("3.0");
+
+System.out.println(bigd.divide(bigd2));	// ArithmeticExceptioin발생.
+System.out.println(bigd.divide(bigd2, 3, RoundingMode.HALF_UP));	// 0.333
+```
+
+</br>
+
+### java.math.MathContext
+
+이 클래스는 반올림 모드와 정밀도(precision)을 하나로 묶어 놓은 것일 뿐 별다른 것은 없다. 한 가지 주의할 점은 `divide()`에서는 scale이 소수점 이하의 자리수를 의미하는데, `MathContext`에서는 precision이 정수와 소수점 이하를 모두 포함한 자리수를 의미한다.
+
+``` java
+BigDecimal bd1 = new BigDecimal("123.456");
+BigDecimal bd1 = new BigDecimal("1.0");
+
+System.out.println(bd1.divide(bd2, 2, HALF_UP));	// 123.46
+System.out.println(bd1.divide(bd2, new MathContext(2, HALF_UP)));	// 1.2E+2
+```
+
+그래서 위의 결과를 보면, scale이 2이면 나눗셈의 결과가 소수점 두 자리까지는 출력되는데, `MathContext`를 이용한 결과는 precision을 가지고 반올림 하므로 `bd1`의 precision인 123456에서 세 번째 자리에서 반올림해서 precision은 12000이 아니라 12가 된다. 여기에 scale이 반영되어 '1.2E+2'가 된 것이다.
+
+</br>
+
+### scale의 변경
+
+`BigDecimal`을 10으로 곱하거나 나누는 대신 scale의 값을 변경함으로써 같은 결과를 얻을 수 있다. `BigDecimal`의 scale을 변경하려면, `setScale()`을 이용하면 된다.
+
+``` java
+BigDecimal setScale(int newScale)
+BigDecimal setScale(int newScale, int roundingMode)
+BigDecimal setScale(int newScale, RoundingMode mode)
+```
+
+`setScale()`로 scale을 값을 줄이는 것은 10의 n제곱으로 나누는 것과 같으므로, `divide()`를 호출할 때처럼 오차가 발생할 수 있고 반올림 모드를 지정해주어야 한다.
+
+예제 9-44 / ch9 / BigDecimalEx.java
+
+``` java
+import java.math.*;
+import static java.math.BigDecimal.*;
+import static java.math.RoundingMode.*;
+
+public class BigDecimalEx {
+	public static void main(String[] args) {
+		BigDecimal bd1 = new BigDecimal("123.456");
+		BigDecimal bd2 = new BigDecimal("1.0");
+		
+		System.out.print("bd1 = " + bd1);
+		System.out.print(",\tvalue = " + bd1.unscaledValue());
+		System.out.print(",\tscale = " + bd1.scale());
+		System.out.print(",\tprecision = " + bd1.precision());
+		System.out.println();
+		
+		System.out.print("bd2 = " + bd2);
+		System.out.print(",\tvalue = " + bd2.unscaledValue());
+		System.out.print(",\tscale = " + bd2.scale());
+		System.out.print(",\tprecision = " + bd2.precision());
+		System.out.println();
+		
+		BigDecimal bd3 = bd1.multiply(bd2);
+		System.out.print("bd3 = " + bd3);
+		System.out.print(",\tvalue = " + bd3.unscaledValue());
+		System.out.print(",\tscale = " + bd3.scale());
+		System.out.print(",\tprecision = " + bd3.precision());
+		System.out.println();
+		
+		System.out.println(bd1.divide(bd2, 2, HALF_UP));	// 123.46
+		System.out.println(bd1.setScale(2, HALF_UP));		// 123.46
+		System.out.println(bd1.divide(bd2, new MathContext(2, HALF_UP)));
+	}
+}
+```
+
+```
+bd1 = 123.456,	value = 123456,		scale = 3,	precision = 6
+bd2 = 1.0,		value = 10,			scale = 1,	precision = 2
+bd3 = 123.4560,	value = 1234560,	scale = 4,	precision = 7
+123.46
+123.46
+1.2E+2
+```
