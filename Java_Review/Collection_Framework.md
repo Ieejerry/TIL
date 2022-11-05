@@ -1188,3 +1188,403 @@ public class PriorityQueueEx {
 덱은 스택과 큐를 하나로 합쳐놓은 것과 같으며 스택으로 사용할 수도 있고, 큐로 사용할 수도 있다.
 
 ![image](https://ifh.cc/g/h2DTK7.png)
+
+</br>
+
+## 1.5 Iterator, ListIterater, Enumeration
+
+`Iterator`, `ListIterator`, `Enumeration`은 모두 컬렉션에 저장된 요소를 접근하는데 사용되는 인터페이스이다. `Eumeration`은 `Iterator`의 구버전이며, `ListIterator`는 `Iterator`의 기능을 향상 시킨 것이다.
+
+### Iterator
+
+컬렉션 프레임워크에서는 컬렉션에 저장된 요소들을 읽어오는 방법을 표준화하였다. 컬렉션에 저장된 각 요소에 접근하는 기능을 가진 `Iterator`인터페이스를 정의하고, `Colloection`인터페이스에는 'Iterator(Iterator를 구현한 클래스의 인스턴스)'를 반환하는 `iterator()`를 정의하고 있다.
+
+``` java
+public interface Iterator {
+	boolean hasNext();
+	Object next();
+	void remove();
+}
+
+public interface Collection {
+	...
+	public Iterator iterator();
+	...
+}
+```
+
+`iterator()`는 `Collection`인터페이스에 정의된 메소드이므로 `Collection`인터페이스의 자손인 `List`와 `Set`에도 포함되어 있다. 그래서 `List`와 `Set`인터페이스를 구현하는 컬렉션은 `iterator()`가 각 컬렉션의 특징에 알맞게 작성되어 있다. 컬렉션 클래스에 대해 `iterator()`를 호출하여 `Iterator`를 얻은 다음 반복문, 주로 while문을 사용해서 컬렉션 클래스의 요소들을 읽어 올 수 있다.
+
+![image](https://ifh.cc/g/xw965O.png)
+
+`ArrayList`에 저장된 요소들을 출력하기 위한 코드는 다음과 같이 작성할 수 있다.
+
+``` java
+Collection c = new ArrayList();	// 다른 컬렉션으로 변경시 이 부분만 고치면 된다.
+Iterator it = c.iterator();
+
+while(it.hasNext()) {
+	System.out.println(it.next());
+}
+```
+
+`ArrayList`대신 `Collection`인터페이스를 구현한 다른 컬렉션 클래스에 대해서도 이와 동일한 코드를 사용할 수 있다. 첫 줄에서 `ArrayList`대신 `Collection`인터페이스를 구현한 다른 컬렉션 클래스의 객체를 생성하도록 변경하기만 하면 된다.
+
+`Iterator`를 이용해서 컬렉션의 요소를 읽어오는 방법을 표준화했기 때문에 이처럼 코드의 재사용성을 높이는 것이 가능한 것이다. 이처럼 공통 인터페이스를 정의해서 표준을 정의하고 구현하여 표준을 따르도록 함으로써 코드의 일관성을 유지하여 재사용성을 극대화하는 것이 객체지향 프로그래밍의 중요한 목적 중의 하나이다.
+
+`Map`인터페이스를 구현한 클래스는 키(key)와 값(value)을 쌍(pair)으로 저장하고 있기 때문에 `iterator()`를 직접 호출할 수 없고, 그 대신 `keySet()`이나 `entrySet()`과 같은 메소드를 통해서 키와 값을 각각 따로 Set의 형태로 얻어 온 후에 다시 `iterator()`를 호출해야 `Iterator`를 얻을 수 있다.
+
+``` java
+Map map = new HashMap();
+	...
+Iterator it = map.entrySet().iterator();
+```
+
+`iterator it = map.entrySet().iterator();`는 아래의 두 문장을 하나로 합친 것이라고 이해하면 된다.
+
+``` java
+Set eSet = map.entrySet();
+Iterator it = eSet.iterator();
+```
+
+이 문장들의 실행순서를 그림으로 그려보면 다음과 같다.
+
+![image](https://ifh.cc/g/kfvwYo.png)
+
+① map.entrySet()의 실행결과가 Set이므로   
+Iterator it = map.entrySet().iterator(); → Iterator it = Set인스턴스.iterator();
+
+② map.entrySet()를 통해 얻은 set인스턴스의 iterator()를 호출해서 iterator인스턴스를 얻는다.   
+Iterator it = Set인스턴스.iterator(); → Iterator it = Iterator인스턴스;
+
+③ 마지막으로 Iterator인스턴스의 참조가 it에 저장된다.
+
+`StringBuffer`를 사용할 때 이와 유사한 코드를 많이 보았다.
+
+``` java
+StringBuffer sb = new StringBuffer();
+sb.append("A");
+sb.append("B");
+sb.append("C");
+```
+
+위와 같은 코드를 아래와 같이 간단히 쓸 수 있는데 그 이유는 바로 `append`메소드가 수행 결과로 `StringBuffer`를 리턴하기 떄문이다. 만일 `void append(String str)`과 같이 void를 리턴하도록 선언되어 있다면 위의 코드를 아래와 같이 쓸 수 없다. `append`메소드의 호출결과가 void이기 때문에 또 다시 void에 `append`메소드를 호출할 수 없기 때문이다.
+
+``` java
+StringBuffer sb = new StringBuffer();
+sb.append("A").append("B").append("C");	// StringBuffer append(String str)
+```
+
+</br>
+
+예제 11-13 / ch11 / IteratorEx1.java
+
+``` java
+import java.util.*;
+
+public class IteratorEx1 {
+	public static void main(String[] args) {
+		ArrayList list = new ArrayList();
+		list.add("1");
+		list.add("2");
+		list.add("3");
+		list.add("4");
+		list.add("5");
+		
+		Iterator it = list.iterator();
+		
+		while(it.hasNext()) {
+			Object obj = it.next();
+			System.out.println(obj);
+		}
+	}	// main
+}
+```
+
+```
+1
+2
+3
+4
+5
+```
+
+`List`클래스들은 저장순서를 유지하기 때문에 `Iterator`를 이용해서 읽어 온 결과 역시 저장순서와 동일하지만 `Set`클래스들은 각 요소간의 순서가 유지 되지 않기 때문에 `Iterator`를 이용해서 저장된 요소들을 읽어 와도 처음에 저장된 순서와 같지 않다.
+
+</br>
+
+### ListIterator와 Enumeration
+
+`Enumeration`은 컬렉션 프레임워크이 만들어지기 이전에 사용하던 것으로 `Iterator`의 구버전이라고 생각하면 된다. 이전 버전으로 작성된 소스와의 호환을 위해서 남겨 두고 있을 뿐이므로 가능하면 `Enumeration`대신 `Iterator`를 사용하는 것이 좋다.
+
+`ListIterator`는 `Iterator`를 상속받아서 기능을 추가한 것으로, 컬렉션의 요소에 접근할 때 `Iterator`는 단반향으로만 이동할 수 있는 데 반해 `ListIterator`는 양방향으로의 이동이 가능하다. 다만 `ArrayList`나 `LinkedList`와 같이 `List`인터페이스를 구현한 컬렉션에서만 사용할 수 있다.
+
+> **Enumeration** Iterator의 구버전   
+**ListIterator** Iterator에 양방향 조회기능추가(List를 구현한 경우만 사용가능)
+
+다음은 `Enumeration`, `Iterator`, `ListIterator`의 메소드에 대한 설명이다. `Enumeration`과 `iterator`는 메소드이름만 다를 뿐 기능은 같고, `ListIterator`는 `Iterator`에 이전방향으로의 접근기능을 추가한 것일 뿐이다.
+
+![image](https://ifh.cc/g/DSh9Dm.png)
+
+</br>
+
+![image](https://ifh.cc/g/6FRA8R.png)
+
+</br>
+
+예제 11-14 / ch11 / ListIteratorEx1.java
+
+``` java
+import java.util.*;
+
+public class ListIteratorEx1 {
+	public static void main(String[] args) {
+		ArrayList list = new ArrayList();
+		list.add("1");
+		list.add("2");
+		list.add("3");
+		list.add("4");
+		list.add("5");
+		
+		ListIterator it = list.listIterator();
+		
+		while(it.hasNext()) {
+			System.out.print(it.next());	// 순방향으로 진행하면서 읽어온다.
+		}
+		System.out.println();
+		
+		while(it.hasPrevious()) {
+			System.out.print(it.previous());	// 역방향으로 진행하면서 읽어온다.
+		}
+		System.out.println();
+	}
+}
+```
+
+```
+12345
+54321
+```
+
+`ListIterator`의 사용방법을 보여주는 간단한 예제이다. `Iterator`는 단방향으로만 이동하기 때문에 컬렉션의 마지막 요소에 다다르면 더 이상 사용할 수 없지만, `ListIterator`는 양방향으로 이동하기 때문에 각 요소간의 이동이 자유롭다. 다만 이동하기 전에 반드시 `hasNext()`나 `hasPrevious()`를 호출해서 이동할 수 있는지 확인해야 한다.
+
+위의 표에 있는 메소드 중에서 '선택적 기능(optional operation)'이라고 표시된 것들은 반드시 구현하지 않아도 된다. 예를 들어 `Iterator`인터페이스를 구현하는 클래스에서 `remove()`는 선태적인 기능이므로 구현하지 않도록 괜찮다. 그렇다하더라고 인터페이스로부터 상속받은 메소드는 추상메소드라 메소드의 몸통(body)을 반드시 만들어 주어야하므로 다음과 같이 처리한다.
+
+``` java
+public void remove() {
+	throw new UnsupportedOperationException();
+}
+```
+
+단순히 `public void remove() {};`와 같이 구현하는 것보다 이처럼 예외를 던져서 구현되지 않은 기능이라는 것을 메소드를 호출하는 쪽에 알리는 것이 좋다. 그렇지 않으면 호출하는 쪽에서는 소스를 구해보기 전까지는 이 기능이 바르게 동작하지 않는 이유를 알 방법이 없다.
+
+Java API문서에서 `remove()`메소드의 상세내용을 보면 `remove`메소드를 지원하지 않는 `Iterator`는 `UnsupportedOperationException`을 발생시킨다고 쓰여 있다. 즉, `remove`메소드를 구현하지 않은 경우에는 `UnsupportedOperationException`을 발생시키도록 구현하라는 뜻이다.
+
+위의 코드에서 `remove`메소드의 선언부에 예외처리를 하지 않은 이유는 `UnsupportedOpertionException`이 `RuntimeException`의 자손이기 때문이다.
+
+`Iterator`의 `remove()`는 단독으로 쓰일 수 없고, `next()`와 같이 써야한다. 특정위치의 요소를 삭제하는 것이 아니라 읽어 온 것을 삭제한다. `next()`의 호출없이 `remove()` 호출하면, `IllegalStateException`이 발생한다.
+
+</br>
+
+예제 11-15 / ch11 / IteratorEx2.java
+
+``` java
+import java.util.*;
+
+public class IteratorEx2 {
+	public static void main(String[] args) {
+		ArrayList original = new ArrayList();
+		ArrayList copy1 = new ArrayList();
+		ArrayList copy2 = new ArrayList();
+		
+		for(int i = 0; i < 10; i++) {
+			original.add(i + "");
+		}
+		
+		Iterator it = original.iterator();
+		
+		while(it.hasNext())
+			copy1.add(it.next());
+		
+		System.out.println("= Original에서 copy1로 복사(copy) =");
+		System.out.println("original : " + original);
+		System.out.println("copy1 : " + copy1);
+		System.out.println();
+		
+		it = original.iterator();	// Iterator는 재사용이 안되므로, 다시 얻어와야 한다.
+		
+		while(it.hasNext()) {
+			copy2.add(it.next());
+			it.remove();
+		}
+		
+		System.out.println("= Original에서 copy2로 이동(move) =");
+		System.out.println("original : " + original);
+		System.out.println("copy2 : " + copy2);
+	}	// main
+}	// class
+```
+
+```
+= Original에서 copy1로 복사(copy) =
+original : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+copy1 : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+= Original에서 copy2로 이동(move) =
+original : []
+copy2 : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+
+다음 예제는 전에 만들었던 예제의 `MyVector`클래스를 상속받는 새로운 클래스가 `Iterator`를 구현하도록 한 것이다.
+
+</br>
+
+예제 11-16 / ch11 / MyVector2.java
+
+``` java
+import java.util.*;
+
+public class MyVector2 extends MyVector implements Iterator {
+	int cursor = 0;
+	int lastRet = -1;
+	
+	public MyVector2(int capacity) {
+		super(capacity);
+	}
+	
+	public MyVector2() {
+		this(10);
+	}
+	
+	public String toString() {
+		String tmp = "";
+		Iterator it = iterator();
+		
+		for(int i = 0; it.hasNext(); i++) {
+			if(i != 0) tmp += ", ";
+			tmp += it.next();	// tmp += next().toString();
+		}
+		return "[" + tmp + "]";
+	}
+	
+	public Iterator iterator() {
+		cursor = 0;	// cursor와 lastRet를 초기화 한다.
+		lastRet = -1;
+		return this;
+	}
+	
+	public boolean hasNext() {
+		return cursor != size();
+	}
+	
+	public Object next() {
+		Object next = get(cursor);
+		lastRet = cursor++;
+		return next;
+	}
+	
+	public void remove() {
+		// 더 이상 삭제할 것이 없으면 IllegalStateException를 발생시킨다.
+		if(lastRet == -1) {
+			throw new IllegalStateException();
+		} else {
+			remove(lastRet);
+			cursor--;	// 삭제 후에 cursor의 위치를 감소시킨다.
+			lastRet = -1;	// lastRet의 값을 초기화 한다.
+		}
+	}
+}	// class
+```
+
+`cursor`는 앞으로 읽어 올 요소의 위치를 저장하는데 사용되고, `lastRet`는 마지막으로 읽어 온 요소의 위치(index)를 저장하는데 사용된다.
+
+그래서 `lastRet`는 `cursor`보다 항상 1이 작은 값이 저장되고 `remove()`를 호출하면 이미 `next()`를 통해서 읽은 위치의 요소, 즉 `lastRet`에 저장된 값의 위치에 있는 요소를 삭제하고 `lastRet`의 값을 -1로 초기화 한다.
+
+만일 `next()`를 호출하지 않고 `remove()`를 호출하면 `lastRet`의 값은 -1이 되어 `IllegalStateException`이 발생한다. `remove()`는 `next()`로 읽어 온 객체를 삭제하는 것이기 때문에 `remove()`를 호출하기 전에는 반드시 `next()`가 호출된 상태이어야 한다.
+
+``` java
+public void remove() {
+	// 더 이상 삭제할 것이 없으면 IllegalStateException를 발생시킨다.
+	if(lastRet == -1) {
+		throw new IllegalStateException();
+	} else {
+		remove(lastRet);	// 최근에 읽어온 요소를 삭제한다.
+		cursor--;			// cursor의 위치를 1감소시킨다.
+		lastRet = -1;		// 읽어온 요소가 삭제되었으므로 초기화 한다.
+	}
+}
+```
+
+위의 코드에서 보면 `remove(lastRet)`를 호출하여 `lastRet`의 위치에 있는 객체를 삭제한 다음에 `cursor`의 값을 감소시킨다. 그리고 `lastRet`의 값을 초기화(-1)한다.
+
+그 이유는 `remove`메소드를 호출해서 객체를 삭제하고 나면, 삭제된 위치 이후의 객체들이 빈 공간을 채우기 위해 자동적으로 이동되기 때문에 `cursor`의 위치도 같이 이동시켜주어야 한다. 그리고 읽어온 요소가 삭제되었으므로 읽어온 요소의 위치를 저장하는 `lastRet`의 값은 -1로 초기화해야 한다. `lastRet`의 값이 -1이라는 것은 읽어온 값이 없다는 것을 의미한다.
+
+``` java
+MyVector2 v = new MyVector2(5);
+v.add("0"); v.add("1"); v.add("2"); v.add("3"); v.add("4");
+Iterator it = v.iterator();
+```
+
+1. 만일 위의 코드와 같이 0~4의 값이 저장되어 있는 MyVector2의 iterator를 얻어왔다면 다음과 같은 그림의 상태일 것이다.
+
+![image](https://ifh.cc/g/hHYFHM.png)
+
+2. 그리고 next()를 두 번 호출하면 다음과 같은 그림이 될 것이다. 첫 번째 요소인 0을 읽고 두 번째 요소인 1까지 읽어 온 상태이다.
+
+![image](https://ifh.cc/g/1Z5zRO.png)
+
+3. remove()를 호출하면, 마지막으로 읽어 온 요소인 1이 삭제된다. 이 때 lastRet의 값은 -1로 초기화 되고 cursor의 값은 1감소된다. 데이터가 삭제되어 다른 데이터들이 한자리씩 이동하였기 때문에 cursor의 위치도 한자리 이동되어야 하는 것이다.
+
+![image](https://ifh.cc/g/bFNAmZ.png)
+
+> lastRet의 값이 -1이라는 것은 읽어 온 값이 없다는 의미이다. remove()는 읽어온 값이 있어야 호출될 수 있다.
+
+</br>
+
+예제 11-17 / ch11 / MyVector2Test.java
+
+``` java
+import java.util.*;
+
+public class MyVector2Test {
+	public static void main(String[] args) {
+		MyVector2 v = new MyVector2();
+		v.add("0");
+		v.add("1");
+		v.add("2");
+		v.add("3");
+		v.add("4");
+		
+		System.out.println("삭제 전 : " + v);
+		Iterator it = v.iterator();
+		it.next();
+		it.remove();
+		it.next();
+		it.remove();
+		
+		System.out.println("삭제 후 : " + v);
+	}
+}
+```
+
+```
+삭제 전 : [0, 1, 2, 3, 4]
+삭제 후 : [2, 3, 4]
+```
+
+`MyVector2`클래스를 테스트하는 간단한 예제이다. `MyVector2`객체를 생성하고 데이터를 저장한 다음 `Iterator`를 통해서 첫 번째와 두 번째에 저장된 데이터를 삭제한다.
+
+``` java
+if(lastRet == -1) {
+	throw new IllegalStateException();
+} else {
+	remove(lastRet);
+//	cursor--;	// 주석처리한다.
+	lastRet = -1;
+}
+```
+
+예제 MyVector2.java의 `remove()`에서 위와 같이 주석처리하면, MyVector2Test.java의 실행결과는 다으모가 같이 될 것이다. 0과 1, 첫 번째와 두 번째 요소가 순서대로 삭제되지 않고, 첫 번째와 세 번째 요소인 0과 2가 삭제된 것을 알 수 있다.
+
+삭제 전 : [0, 1, 2, 3, 4]    
+삭제 후 : [1, 3, 4]
