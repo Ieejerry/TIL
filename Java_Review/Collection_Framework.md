@@ -1786,3 +1786,131 @@ index of B = -2
 chArr = [A, B, C, D, E]
 index of B = 1
 ```
+
+</br>
+
+## 1.7 Comparator와 Comparable
+
+`Arrays.sort()`를 호출만 하면 컴퓨터가 알아서 배열을 정렬하는 것처럼 보이지만, 사실은 `Chacter`클래스의 `Comparable`의 구현에 의해 정렬된다.
+
+`Comparator`와 `Comparable`은 모두 인터페이스로 컬렉션을 정렬하는데 필요한 메소드를 정의하고 있으며, `Comparable`을 구현하고 있는 클래스들은 같은 타입의 인스턴스끼리 서로 비교할 수 있는 클래스들, 주로 `Integer`와 같은 wrapper클래스와 `String`, `Date`, `File`과 같은 것들이며 기본적으로 오름차순, 즉 작은 값에서부터 큰 값의 순으로 정렬되도록 구현되어 있다. 그래서 `Comparable`을 구현한 클래스는 정렬이 가능하다는 것을 의미한다. `Comparator`와 `Comparable`의 실제 소스는 다음과 같다.
+
+``` java
+public interface Comparator {
+	int compare(Object o1, Object o2);
+	boolean equals(Object obj);
+}
+
+public interface Comparable {
+	public int comparaTo(Object o);
+}
+```
+
+> Comparable은 java.lang패키지에 있고, Comparator는 java.util패키지에 있다.
+
+`compare()`와 `compareTo()`는 선언형태와 이름이 약간 다를 뿐 두 객체를 비교한다는 같은 기능을 목적으로 고안된 것이다. `compareTo()`의 반환값은 int이지만 실제로는 비교하는 두 객체가 같으면 0, 비교하는 값보다 작으면 음수, 크면 양수를 반환하도록 구현해야 한다. 이와 마찬가지로 `compare()`도 객체를 비교해서 음수, 0, 양수 중의 하나를 반환하도록 구현해야한다.
+
+`equals`메소드는 모든 클래스가 가지고 있는 공통적인 메소드이지만, `Comparator`를 구현하는 클래스는 오버라이딩이 필요할 수도 있다는 것을 알리기 위해서 정의한 것일 뿐, 그냥 `compare(Object o1, Object o2)`만 구현하면 된다.
+
+``` java
+public final class Integer extends Number implements Comparable {
+	...
+	public int comparaTo(Object o) {
+		return compareTo((Integer)o);
+	}
+
+	public int compareTo(Integer anotherInteger) {
+		int thisVal = this.value;
+		int anotherVal = anotherInteger.value;
+
+		// 비교하는 값이 크면 -1, 같으면 0, 작으면 1을 반환한다.
+		return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+	}
+}
+```
+
+위의 코드는 `Integer`클래스의 일부이다. `Comparable`의 `compareTo(Object o)`를 구현해 놓은 것을 볼 수 있다. 두 `Integer`객체에 저장된 int값(value)을 비교해서 같으면 0, 크면 -1, 작으면 1을 반환하는 것을 알 수 있다.
+
+`Comparable`을 구현한 클래스들이 기본적으로 오름차순으로 정렬되어 있지만, 내림차순으로 정렬한다던가 아니면 다른 기준에 의해서 정렬되도록 하고 싶을 때 `Comparator`를 구현해서 정렬기준을 제공할 수 있다.
+
+> **Comparable** 기본 정렬기준을 구현하는데 사용.   
+**Comparator** 기본 정렬기준 외에 다른 기준으로 정렬하고자할 때 사용
+
+</br>
+
+예제 11-19 / ch11 / ComparatorEx.java
+
+``` java
+import java.util.*;
+
+public class ComparatorEx {
+	public static void main(String[] args) {
+		String[] strArr = {"cat", "Dog", "lion", "tiger"};
+		
+		Arrays.sort(strArr);	// String의 Comparable구현에 의한 정렬
+		System.out.println("strArr = " + Arrays.toString(strArr));
+		
+		Arrays.sort(strArr, String.CASE_INSENSITIVE_ORDER);	// 대소문자 구분안함
+		System.out.println("strArr = " + Arrays.toString(strArr));
+		
+		Arrays.sort(strArr, new Descending());	// 역순 정렬
+		System.out.println("strArr = " + Arrays.toString(strArr));
+	}
+}
+
+class Descending implements Comparator {
+	public int compare(Object o1, Object o2) {
+		if(o1 instanceof Comparable && o2 instanceof Comparable) {
+			Comparable c1 = (Comparable)o1;
+			Comparable c2 = (Comparable)o2;
+			return c1.compareTo(o2) * -1;	// -1을 곱해서 기본 정렬방식의 역으로 변경한다.
+									// 또는 c2.compareTo(c1)와 같이 순서를 바꿔도 된다.
+		}
+		return -1;
+	}
+}
+```
+
+```
+strArr = [Dog, cat, lion, tiger]
+strArr = [cat, Dog, lion, tiger]
+strArr = [tiger, lion, cat, Dog]
+```
+
+`Arrays.sort()`는 배열을 정의할 때, `Comparator`를 지정해주지 않으면 저장하는 객체(주로 Comparable을 구현한 클래스의 객체)에 구현된 내용에 따라 정렬된다.
+
+``` java
+static void sort(Object[] a)	// 객체 배열에 저자오딘 객체가 구현한 Comparable에 의한 정렬
+static void sort(Object[] a, Comparator c)	// 지정한 Comparator에 의한 정렬
+```
+
+`String`의 `Comparable`구현은 문자열이 사전 순으로 정렬되도록 작성되어 있다. 문자열의 오름차순 정렬은 공백, 숫자, 대문자, 소문자의 순으로 정렬되는 것을 의미한다. 정확히 얘기하면 문자의 유니코드의 순서가 작은 값에서부터 큰 값으로 정렬되는 것이다.
+
+그리고 아래와 같이 대소문자를 구분하지 않고 비교하는 `Comparator`를 상수의 형태로 제공한다.
+
+``` java
+public static final Comparator CASE_INSENSITIVE_ORDER
+```
+
+이 `Comparator`를 이용하면, 문자열을 대소문자로 구분없이 정렬할 수 있다.
+
+``` java
+Arrays.sort(strArr, String.CASE_INSENSITIVE_ORDER);	// 대소문자를 구분없이 정렬
+```
+
+`String`의 기본 정렬을 반대로 하는 것, 즉 문자열을 내림차순(descending order)을 구현하는 것은 아주 간단하다. 단지 `String`에 구현된 `compareTo()`의 결과에 -1을 곱하기만 하면 된다. 또는 비교하는 객체의 위치를 바꿔서 `c2.compareTo(c1)`과 같이 해도 된다.
+
+다만 `compare()`의 매개변수가 `Object`타입이기 때문에 `compareTo()`를 바로 호출할 수 없으므로 먼저 `Comparable`로 형변환해야 한다.
+
+``` java
+class Descending implements Comparator {
+	public int compare(Object o1, Object o2) {
+		if(o1 instanceof Comparable && o2 instanceof Comparable) {
+			Comparable c1 = (Comparable)o1;
+			Comparable c2 = (Comparable)o2;
+			return c1.compareTo(c2) * -1;	// 기본 정렬방식의 역으로 변경한다.
+		}
+		return -1;
+	}
+}
+```
