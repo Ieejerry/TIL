@@ -1914,3 +1914,342 @@ class Descending implements Comparator {
 	}
 }
 ```
+
+</br>
+
+## 1.8 HashSet
+
+`HashSet`은 `Set`인터페이스를 구현한 가장 대표적인 컬렉션이며, `Set`인터페이스의 특징대로 `HashSet`은 중복된 요소를 저장하지 않는다.
+
+`ArrayList`와 같이 `List`인터페이스를 구현한 컬렉션과 달리 `HashSet`은 저장순서를 유지하지 않으므로 저장순서를 유지하고자 한다면 `LinkedHashSet`을 사용해야한다.
+
+> HashSet은 내부적으로 HashMap을 이용해서 만들어졌으며, HashSet이란 이름은 해싱(hasing)을 이용해서 구현했기 때문에 붙여진 것이다.
+
+![image](https://ifh.cc/g/jyy3VS.png)
+
+> load factor는 컬렉션 클래스에 저장공간이 가득 차기 전에 미리 용량을 확보하기 위한 것으로 이 값을 0.8로 지정하면, 저장공간의 80%가 채워졌을 때 용량이 두 배로 늘어난다. 기본값은 0.75, 즉 75%이다.
+
+</br>
+
+예제 11-20 / ch11 / hashSetEx1.java
+
+``` java
+import java.util.*;
+
+public class HashSetEx1 {
+	public static void main(String[] args) {
+		Object[] objArr = {"1", new Integer(1), "2", "2", "3", "3", "4", "4", "4"};
+		Set set = new HashSet();
+		
+		for(int i = 0; i < objArr.length; i++) {
+			set.add(objArr[i]);	// HashSet에 objArr의 요소들을 저장한다.
+		}
+		
+		// HashSet에 저장된 요소들을 출력한다.
+		System.out.println(set);
+	}
+}
+```
+
+```
+[1, 1, 2, 3, 4]
+```
+
+결과에서 알 수 있듯이 중복된 값은 저장되지 않았다. `add`메소드는 객체를 추가할 때 `HashSet`에 이미 같은 객체가 있으면 중복으로 간주하고 저장하지 않는다. 그리고는 작업이 실패했다는 의미로 false를 반환한다.
+
+'1'이 두 번 출력되었는데, 둘 다 '1'로 보이기 때문에 구별이 안 되지만, 사실 하나는 `String`인스턴스이고 다른 하나는 `Integer`인스턴스로 서로 다른 객체이므로 중복을오 간주하지 않는다.
+
+`Set`을 구현한 컬렉션 클래스는 `List`를 구현한 컬렉션 클래스와 달리 순서를 유지하지 않기 때문에 저장한 순서와 다를 수 있다.
+
+만일 중복을 제거하는 동시에 저장한 순서를 유지하고자 한다면 `HashSet`대신 `LinkedHashSet`을 사용해야한다.
+
+</br>
+
+예제 11-21 / ch11 / HashSetLotto.java
+
+``` java
+import java.util.*;
+
+public class HashSetLotto {
+	public static void main(String[] args) {
+		Set set = new HashSet();
+		
+		for(int i = 0; set.size() < 6; i++) {
+			int num = (int)(Math.random() * 45) + 1;
+			set.add(new Integer(num));
+		}
+		
+		List list = new LinkedList(set);	// LinkedList(Collection c)
+		Collections.sort(list);	// Collections.sort(List list)
+		System.out.println(list);
+	}
+}
+```
+
+```
+[12, 16, 26, 41, 44, 45]
+```
+
+번호를 크기순으로 정렬하기 위해서 `Collections`클래스의 `sort(List list)`를 사용했다. 이 메소드는 인자로 `List`인터페이스 타입을 필요로 하기 때문에 `LinkedList`클래스의 생성자 `LinkedList(Collection c)`를 이용해서 `HashSet`에 저장된 객체들을 `LinkedList`에 담아서 처리했다.
+
+실행결과의 정렬기준은, 컬렉션에 저장된 객체가 `Integer`이기 때문에 `Integer`클래스에 정의된 기본정렬이 사용되었다.
+
+> Collection은 인터페이스고 Collections는 클래스임에 주의해야 한다.
+
+</br>
+
+예제 11-22 / ch11 / Bingo.java
+
+``` java
+import java.util.*;
+
+public class Bingo {
+	public static void main(String[] args) {
+		Set set = new HashSet();
+//		Set set = new LinkedHashSet();
+		int[][] board = new int[5][5];
+		
+		for(int i = 0; set.size() < 25; i++) {
+			set.add((int)(Math.random() * 50) + 1 + "");
+		}
+		
+		Iterator it = set.iterator();
+		
+		for(int i = 0; i < board.length; i++) {
+			for(int j = 0; j < board[i].length; j++) {
+				board[i][j] = Integer.parseInt((String)it.next());
+				System.out.print((board[i][j] < 10 ? "  " : " ") + board[i][j]);
+			}
+			System.out.println();
+		}
+	}	// main
+}
+```
+
+```
+ 44 23 46 24 26
+ 49 27 29 30 10
+ 35 13 36 14 39
+ 18  1  4  7  8
+  9 41 20 42 43
+```
+
+1~50사이의 숫자 중에서 25개를 골라서 '5X5'크기의 빙고판을 만드는 예제이다. `next()`는 반환값이 `Object`타입이므로 형변환해서 원래의 타입으로 되돌려 놓아야 한다.
+
+그런데 몇번 실행해보면 같은 숫자가 비슷한 위치에 나온다는 사실을 발견할 수 있을 것이다. 앞서 언급한 것과 같이 `HashSet`은 저장된 순서를 보장하지 않고 자체적인 저장방식에 따라 순서가 결정되기 때문이다.
+
+</br>
+
+예제 11-23 / ch11 / HashSetEx3.java
+
+``` java
+import java.util.*;
+
+public class HashSetEx3 {
+	public static void main(String[] args) {
+		HashSet set = new HashSet();
+		
+		set.add("abc");
+		set.add("abc");
+		set.add(new Person("David", 10));
+		set.add(new Person("David", 10));
+		
+		System.out.println(set);
+	}
+}
+
+class Person {
+	String name;
+	int age;
+	
+	Person(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+	
+	public String toString() {
+		return name + " : " + age;
+	}
+}
+```
+
+```
+[abc, David : 10, David : 10]
+```
+
+`Person`클래스는 `name`과 `age`를 멤버변수로 갖는다. 이름(name)과 나이(age)가 같으면 같은 사람으로 인식하도록 하려는 의도로 작성하였다. 하지만 실행결과를 보면 두 인스턴스의 `name`과 `age`의 값이 같음에도 불구하고 서로 다른 것으로 인식하여 'David:10'이 두 번 출력되었다.
+
+</br>
+
+예제 11-24 / ch11 / HashSetEx4.java
+
+``` java
+import java.util.*;
+
+public class HashSetEx4 {
+	public static void main(String[] args) {
+		HashSet set = new HashSet();
+		
+		set.add(new String("abc"));
+		set.add(new String("abc"));
+		set.add(new Person2("David", 10));
+		set.add(new Person2("David", 10));
+		
+		System.out.println(set);
+	}
+}
+
+class Person2 {
+	String name;
+	int age;
+	
+	Person2(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj instanceof Person2) {
+			Person2 tmp = (Person2)obj;
+			return name.equals(tmp.name) && age == tmp.age;
+		}
+		return false;
+	}
+	
+	public int hashCode() {
+		return (name+age).hashCode();
+	}
+	
+	public String toString() {
+		return name + " : " + age;
+	}
+}
+```
+
+```
+[abc, David : 10]
+```
+
+`HashSet`의 `add`메소드는 새로운 요소를 추가하기 전에 기존에 저장된 요소와 같은 것인지 판별하기 위해 추가하려는 요소의 `equals()`와 `hashCode()`를 호출하기 때문에 `equals()`와 `hashCode()`를 목적에 맞게 오버라이딩해야 한다.
+
+그래서 `String`클래스에서 같은 내용의 문자열에 대한 `equals()`의 호출결과가 true인 것과 같이, `Person2`클래스에서도 두 인스턴스의 `name`과 `age`가 서로 같으면 true를 반환하도록 `equals()`를 오버라이딩했다. 그리고 `hashCode()`는 `String`클래스의 `hashCode()`를 이용해서 구현했다. `String`클래스의 `hashCode()`는 잘 구현되어 있기 때문에 이를 활용하면 간단히 처리할 수 있다.
+
+``` java
+public int hashCode() {
+	return (name+age).hashCode()
+}
+```
+
+위의 코드를 JDK1.8부터 추가된 `java.util.Objects`클래스의 `hash()`를 이용해서 작성하면 아래와 같다. 이 메소드의 괄호 안에 클래스의 인스턴스 변수들을 넣으면 된다. 이전의 코드와 별반 다르지 않지만, 가능하면 아래의 코드를 사용하는 것이 좋다.
+
+``` java
+public int hashCode() {
+	return Objects.hash(name, age);	// int hash(Object... value)
+}
+```
+
+오버라이딩을 통해 작성된 `hashCode()`는 다음의 세 가지 조건을 만족 시켜야 한다.
+
+1. 실행 중인 애플리케이션 내의 동일한 객체에 대해서 여러 번 hashCode()를 호출해도 동일한 int값을 반환해야한다. 하지만, 실행시마다 동일한 int값을 반환할 필요는 없다. (단, equals메소드의 구현에 사용된 멤버변수와 값이 바뀌지 않았다고 가정한다.)
+
+예를 들어 `Person2`클래스의 `equals`메소드에 사용된 멤버변수 `name`과 `age`의 값이 바뀌지 않는 한, 하나의 `Person2`인스턴스에 대해 `hashCode()`를 여러 번 호출했을 때 항상 같은 int값을 얻어야 한다.
+
+``` java
+Person2 p = new Person2("David", 10);
+
+int hashCode1 = p.hashCode();
+int hashCode2 = p.hashCode();
+
+p.age = 20;
+int hashCode3 = p.hashCode();
+```
+
+위의 코드에서 `hashCode1`의 값과 `hashCode2`의 값은 항상 일치해야하지만 이 두 값이 매번 실행할 때마다 반드시 같은 값일 필요는 없다. `hashCode3`은 `equals`메소드에 사용된 멤버변수 `age`를 변경한 후에 `hashCode`메소드를 호출한 결과이므로 `hashCode1`이나 `hashCode2`와 달라도 된다.
+
+> String클래스는 문자열의 내용으로 해시코드를 만들어 내기 때문에 내용이 같은 문자열에 대한 hashCode() 호출은 항상 동일한 해시코드를 반환한다. 반면에 Object클래스는 객체의 주소로 해시코드를 만들어 내기 때문에 실행할 때마다 해시코드값이 달라질 수 있다.
+
+2. equals메소드를 이용한 비교에 의해서 true를 얻은 두 객체에 대해 각각 hashCode()를 호출해서 얻은 결과는 반드시 같아야 한다.
+
+인스턴스 `p1`과 `p2`에 대해서 `equals`메소드를 이용한 비교의 결과인 변수 `b`의 값이 true라면, `hashCode1`과 `hashCode2`의 값은 같아야 한다는 뜻이다.
+
+``` java
+Person2 p1 = new Person2("David", 10);
+Person2 p2 = new Person2("David", 10);
+
+boolean b = p1.equals(p2);
+
+int hashCode1 = p1.hashCode();
+int hashCode2 = p2.hashCode();
+```
+
+3. equals메소드를 호출했을 때 false를 반환하는 두 객체는 `hashCode()`호출에 대해 같은 int값을 반환하는 경우가 있어도 괜찮지만, 해싱(hashing)을 사용하는 컬렉션의 성능을 향상시키기 위해서는 다른 int값을 반환하는 것이 좋다.
+
+위의 코드에서 변수 `b`의 값이 false일지라도 `hashCode1`과 `hashCode2`의 값이 같은 경우가 발생하는 것을 허용한다. 하지만, 해시코드를 사용하는 `Hashtable`이나 `HashMap`과 같은 컬렉션의 성능을 높이기 위해서는 가능한 한 서로 다른 값을 반환하도록 `hashCode()`를 잘 작성해야 한다는 뜻이다.
+
+서로 다른 객체에 대해서 해시코드값(hashCode()를 호출한 결과)이 중복되는 경우가 많이질수록 해싱을 사용하는 `Hashtable`, `HashMap`과 같은 컬렉션의 검색속도가 떨어진다.
+
+두 객체에 대해 `equals`메소드를 호출한 결과가 true이면, 두 객체의 해시코드는 반드시 같아야하지만, 두 객체의 해시코드가 같다고 해서 `equals`메소드의 호출결과가 반드시 true이어야 하는 것은 아니다.
+
+</br>
+
+예제 11-25 / ch11 / HashSetEx5.java
+
+``` java
+import java.util.*;
+
+public class HashSetEx5 {
+	public static void main(String[] args) {
+		HashSet setA = new HashSet();
+		HashSet setB = new HashSet();
+		HashSet setHab = new HashSet();
+		HashSet setKyo = new HashSet();
+		HashSet setCha = new HashSet();
+		
+		setA.add("1");	setA.add("2");	setA.add("3");
+		setA.add("4");	setA.add("5");
+		System.out.println("A = " + setA);
+		
+		setB.add("4");	setB.add("5");	setB.add("6");
+		setB.add("7");	setB.add("8");
+		System.out.println("B = " + setB);
+		
+		Iterator it = setB.iterator();
+		while(it.hasNext()) {
+			Object tmp = it.next();
+			if(setA.contains(tmp))
+				setKyo.add(tmp);
+		}
+		
+		it = setA.iterator();
+		while(it.hasNext()) {
+			Object tmp = it.next();
+			if(!setB.contains(tmp))
+				setCha.add(tmp);
+		}
+		
+		it = setA.iterator();
+		while(it.hasNext()) {
+			setHab.add(it.next());
+		}
+		
+		it = setB.iterator();
+		while(it.hasNext()) {
+			setHab.add(it.next());
+		}
+		
+		System.out.println("A ∩ B = " + setKyo);	// 한글 ㄷ을 누르고 한자키
+		System.out.println("A ∪ B = " + setHab);		// 한글 ㄷ을 누르고 한자키
+		System.out.println("A - B = " + setCha);
+	}
+}
+```
+
+```
+A = [1, 2, 3, 4, 5]
+B = [4, 5, 6, 7, 8]
+A ∩ B = [4, 5]
+A ∪ B = [1, 2, 3, 4, 5, 6, 7, 8]
+A - B = [1, 2, 3]
+```
+
+이 예제는 두 개의 `HashSet`에 저장된 객체들을 비교해서 합집합, 교집합, 차집합을 구하는 방법을 보여준다. 사실은 `Set`은 중복을 허용하지 않으므로 `HashSet`의 메소드를 호출하는 것만으로도 간단하게 합집합(addAll), 교집합(retainAll), 차집합(removeAll)을 구할 수 있다.
