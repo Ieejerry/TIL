@@ -2253,3 +2253,197 @@ A - B = [1, 2, 3]
 ```
 
 이 예제는 두 개의 `HashSet`에 저장된 객체들을 비교해서 합집합, 교집합, 차집합을 구하는 방법을 보여준다. 사실은 `Set`은 중복을 허용하지 않으므로 `HashSet`의 메소드를 호출하는 것만으로도 간단하게 합집합(addAll), 교집합(retainAll), 차집합(removeAll)을 구할 수 있다.
+
+</br>
+
+## 1.9 TreeSet
+
+`TreeSet`은 이진 검색 트리(binary search tree)라는 자료구조의 형태로 데이터를 저장하는 컬렉션 클래스이다. 이진 검색 트리는 정렬, 검색, 범위검색(range search)에 높은 성능을 보이는 자료구조이며 `TreeSet`은 이진 검색 트리의 성능을 향상시킨 '레드-블랙 트리(Red-Black tree)'로 구현되어 있다.
+
+그리고 `Set`인터페이스를 구현했으므로 **중복된 데이터의 저장을 허용하지 않으며 정렬된 위치에 저장하므로 저장순서를 유지하지도 않는다.**
+
+이진 트리(binary tree)는 링크드리스트처럼 여러 개의 노드(node)가 서로 연결된 구조로, 각 노드에 최대 2개의 노드를 연결할 수 있으며 '루트(root)'라고 불리는 하나의 노드에서부터 시작해서 계속 확장해 나갈 수 있다.
+
+위 아래로 연결된 두 노드를 '부모-자식관계'에 있다고 하며 위의 노드를 부모 노드, 아래의 노드를 자식 노드라 한다. 부모-자식관계는 상대적인 것이며 하나의 부모 노드는 최대 ㅊ두 개의 자식 노드와 연결될 수 있다.
+
+아래의 그림에서 A는 B와 C의 부모 노드이고, B와 C는 A의 자식 노드이다.
+
+> 트리(tree)는 각 노드간의 연결된 모양이 나무와 같다고 해서 붙여진 이름이다.
+
+![image](https://ifh.cc/g/GCaoGM.png)
+
+이진 트리의 노드를 코드로 표현하면 다음과 같다.
+
+``` java
+class TreeNode {
+	TreeNode left;	// 왼쪽 자식노드
+	Object element;	// 객체를 저장하기 위한 참조변수
+	TreeNode right;	// 오른쪽 자식노드
+}
+```
+
+데이터를 저장하기 위한 `Object`타입의 참조변수 하나와 두 개의 노드를 참조하기 위한 두 개의 참조변수를 선언했다.
+
+이진 검색 트리(binary search tree)는 부모노드의 왼쪽에는 부모노드의 값보다 작은 값의 자식노드를 오른쪽에는 큰 값의 자식노드를 저장하는 이진 트리이다.
+
+예를 들어 데이터를 5, 1, 7의 순서로 저장한 이진 트리의 구조는 아래와 같이 표현할 수 있다. 실제로는 오른쪽 그림과 같이 표현해야 한다.
+
+![image](https://ifh.cc/g/0pFBz5.png)
+
+예를 들어 이진검색트리에 7, 4, 9, 1, 5의 순서로 값을 저장한다고 가정하면 다음과 같은 순서로 진행된다.
+
+![image](https://ifh.cc/g/OQrHlO.png)
+
+첫 번째로 저장되는 값은 루트가 되고, 두 번째 값은 트리의 루트부터 시작해서 값의 크기를 비교하면서 트리를 따라 내려간다. 작은 값은 왼쪽에 큰 값은 오른쪽에 저장한다. 이렇게 트리를 구성하면, 왼쪽 마지막 레벨이 제일 작은 값이 되고 오른쪽 마지막 레벨의 값이 제일 큰 값이 된다. 컴퓨터는 알아서 값을 비교하지 못한다.
+
+`TreeSet`에 저장되는 객체가 `Comparable`을 구현하던가 아니면, `TreeSet`에게 `Comparator`를 제공해서 두 객체를 비교할 방법을 알려줘야 한다. 그렇지 않으면, `TreeSet`에 객체를 저장할 때 예외가 발생한다.
+
+왼쪽 마지막 값에서부터 오른쪽 값까지 값을 '왼쪽 노드 → 부모 노드 → 오른쪽 노드'순으로 읽어오면 오름차순으로 정렬된 순서를 얻을 수 있다. `TreeSet`은 이처럼 정렬된 상태를 유지하기 때문에 단일 값 검색과 범위검색(range search)이 매우 빠르다.
+
+저장된 값의 개수에 비례해서 검색시간이 증가하긴 하지만 값의 개수가 10배 증가해도 특정 값을 찾는데 필요한 비교횟수가 3~4번만 증가할 정도로 검색효율이 뛰어난 자료구조이다.
+
+트리는 데이터를 순차적으로 저장하는 것이 아니라 저장위치를 찾아서 저장해야하고, 삭제하는 경우 트리의 일부를 재구성해야하므로 링크드 리스트보다 데이터 추가/삭제 시간은 더 걸린다. 대신 배열이나 링크드 리스트에 비해 검색과 정렬기능이 더 뛰어나다.
+
+> **이진 검색 트리(binary search tree)는**
+> - 모든 노드는 최대 두 개의 자식노드를 가질 수 있다.
+> - 왼쪽 자식노드의 값은 부모노드의 값보다 작고 오른쪽 자식노드의 값은 부모노드의 값보다 커야한다.
+> - 노드의 추가 삭제에 시간이 걸린다.(순차적으로 저장하지 않으므로)
+> - 검색(범위검색)과 정렬에 유리하다.
+> - 중복된 값을 저장하지 못한다.
+
+![image](https://ifh.cc/g/FPAoJf.png)
+
+</br>
+
+예제 11-26 / ch11 / TreeSetLotto.java
+
+``` java
+import java.util.*;
+
+public class TreeSetLotto {
+	public static void main(String[] args) {
+		Set set = new TreeSet();
+		
+		for(int i = 0; set.size() < 6; i++) {
+			int num = (int)(Math.random() * 45) + 1;
+			set.add(num);	// set.add(new Integer(num));
+		}
+		
+		System.out.println(set);
+	}
+}
+```
+
+```
+[1, 16, 18, 36, 38, 43]
+```
+
+이전의 예제 11-21 HashSetLotto.java를 `TreeSet`을 사용해서 바꾸었다. 이전 예제와는 달리 정렬하는 코드가 빠져 있는데, `TreeSet`은 저장할 때 이미 정렬하기 때문에 읽어올 때 따로 정렬할 필요가 없기 때문이다.
+
+</br>
+
+예제 11-27 / ch11 / TreeSetEx1.java
+
+``` java
+import java.util.*;
+
+public class TreeSetEx1 {
+	public static void main(String[] args) {
+		TreeSet set = new TreeSet();
+		
+		String from = "b";
+		String to = "d";
+		
+		set.add("abc");		set.add("alien");	set.add("bat");
+		set.add("car");		set.add("Car");		set.add("disc");
+		set.add("dance");	set.add("dZZZZ");	set.add("dzzzz");
+		set.add("elephant");set.add("elevator");set.add("fan");
+		set.add("flower");
+		
+		System.out.println(set);
+		System.out.println("range search : from " + from + " to " + to);
+		System.out.println("result1 " + set.subSet(from, to));
+		System.out.println("result2 " + set.subSet(from, to + "zzz"));
+	}
+}
+```
+
+```
+[Car, abc, alien, bat, car, dZZZZ, dance, disc, dzzzz, elephant, elevator, fan, flower]
+range search : from b to d
+result1 [bat, car]
+result2 [bat, car, dZZZZ, dance, disc]
+```
+
+`subSet()`을 이용해서 범위검색(range search)할 때 시작범위는 포함되지만 끝 범위는 포함되지 않으므로 `result1`에는 c로 시작하는 단어까지만 검색결과에 포함되어 있다.
+
+만일 끝 범위인 d로 시작하는 단어까지 포함시키고자 한다면, 아래와 같이 끝 범위에 'zzz'와 같은 문자열을 붙이면 된다.
+
+``` java
+System.out.println("result2 " + set.subSet(from, to + "zzz"));
+```
+
+d로 시작하는 단어 중에서 'dzzz' 다음에 오는 단어는 없을 것이기 때문에 d로 시작하는 모든 단어들이 포함된다.
+
+결과를 보면 `abc`보다 `Car`가 앞에 있고 `dZZZZ`가 `dance`보다 앞에 정렬되어 있는 것을 알 수 있다. 대문자가 소문자보다 우선하기 때문에 대소문자가 섞여 있는 경우 의되한 것과는 다른 범위검색결과를 얻을 수 있다.
+
+그래서 가능하면 대문자 또는 소문자로 통일해서 저장하는 것이 좋다.
+
+> 반드시 대소문자가 섞여 있어야 하거나 다른 방식으로 정렬해야하는 경우 Comparator를 이용하면 된다.
+
+문자열의 경우 정렬순서는 문자의 코드값이 기준이 되므로, 오름차순 정렬의 경우 코드값의 크기가 작은 순서에서 큰 순서, 즉 공백, 숫자, 대문자, 소문자 순으로 정렬되고 내림차순의 경우 그 반대가 된다.
+
+</br>
+
+예제 11-28 / ch11 / AsciiPrint.java
+
+``` java
+import java.util.*;
+
+public class AsciiPrint {
+	public static void main(String[] args) {
+		char ch = ' ';
+		// 공백(' ')이후의 문자들을 출력한다.
+		for(int i = 0; i < 95; i++)
+			System.out.print(ch++);
+	}
+}
+```
+
+```
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+```
+
+</br>
+
+예제 11-29 / ch11 / TreeSetEx2.java
+
+``` java
+import java.util.*;
+
+public class TreeSetEx2 {
+	public static void main(String[] args) {
+		TreeSet set = new TreeSet();
+		int[] score = {80, 95, 50, 35, 45, 65, 10, 100};
+		
+		for(int i = 0; i < score.length; i++)
+			set.add(new Integer(score[i]));
+		
+		System.out.println("50보다 작은 값 : " + set.headSet(new Integer(50)));
+		System.out.println("50보다 큰 값 : " + set.tailSet(new Integer(50)));
+	}
+}
+```
+
+```
+50보다 작은 값 : [10, 35, 45]
+50보다 큰 값 : [50, 65, 80, 95, 100]
+```
+
+`headSet`메소드와 `tailSet`메소드를 이용하면, `TreeSet`에 저장된 객체 중 지정된 기준 값보다 큰 값의 객체들과 작은 값의 객체들을 얻을 수 있다.
+
+예제에 사용된 값들로 이진 검색 트리를 구성해 보면 다음 그림과 같다.
+
+![image](https://ifh.cc/g/MahC0z.png)
+
+위의 그림을 보면 50이 저장된 노드의 왼쪽노드와 그 아래 연결된 모든 노드의 값은 50보다 작고, 나머지 다른 노드의 값들은 50보다 같거나 크다는 것을 알 수 있다.
