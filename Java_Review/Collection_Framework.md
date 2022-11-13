@@ -2447,3 +2447,383 @@ public class TreeSetEx2 {
 ![image](https://ifh.cc/g/MahC0z.png)
 
 위의 그림을 보면 50이 저장된 노드의 왼쪽노드와 그 아래 연결된 모든 노드의 값은 50보다 작고, 나머지 다른 노드의 값들은 50보다 같거나 크다는 것을 알 수 있다.
+
+</br>
+
+## 1.10 HashMap과 Hashtable
+
+`Hashtable`과 `HashMap`의 관계는 `Vector`와 `ArrayList`의 관계와 같아서 `Hashtable`보다는 새로운 버전인 `HashMap`을 사용하는 것이 좋다.
+
+`HashMap`은 `Map`을 구현했으므로 앞에서 살펴본 `Map`의 특징, 키(key)와 값(value)을 묶어서 하나의 데이터(entry)로 저장한다는 특징을 갖는다. 그리고 해싱(hashing)을 사용하기 때문에 많은 양의 데이터를 검색하는데 있어서 뛰어난 성능을 보인다.
+
+`HashMap`이 데이터를 어떻게 저장하는지 확인하기 위해 실제소스의 일부를 보겠다.
+
+``` java
+public class HashMap extends AbstractMap implements Map, Cloneable, Serializable {
+	transient Entry[] table;
+		...
+	static class Entry implements Map.Entry {
+		final Object key;
+		Object value;
+			...
+	}
+}
+```
+
+`HashMap`은 `Entry`라는 내부 클래스를 정의하고, 다시 `Entry`타입의 배열을 선언하고 있다. 키(key)와 값(value)은 별개의 값이 아니라 서로 관련된 값이기 때문에 각각의 배열로 선언하기 보다는 하나의 클래스로 정의해서 하나의 배열로 다루는 것이 데이터의 무결성(integrity)적인 측면에서 더 바림직하기 때문이다.
+
+![image](https://ifh.cc/g/BcKOoh.png)
+
+> Map.Entry는 Map인터페이스에 정의된 'static inner interface'이다.
+
+`HashMap`은 키와 값을 각각 Object타입으로 저장한다. 즉 (Object, Object)의 형태로 저장하기 때문에 어떠한 객체도 저장할 수 있지만 키는 주로 String을 대문자 또는 소문자로 통일해서 사용하곤 한다.
+
+> **키(key)** 컬렉션 내의 키(key) 중에서 유일해야 한다.   
+> **값(value)** 키(key)와 달리 데이터의 중복을 허용한다.
+
+키는 저장한 값을 찾는데 사용되는 것이기 때문에 컬렉션 내에서 유일(unique)해야 한다. 즉, `HashMap`에 저장된 데이터를 하나의 키로 검색했을 때 결과가 단 하나이어야 함을 뜻한다. 만일 하나의 키에 대해 여러 검색결과과 값을 얻는다면 원하는 값이 어떤 값인지 알 수 없기 때문이다.
+
+예를 들어 사용자ID가 키(key)로, 비밀번호가 값(value)으로 연결되어 저장된 데이터집합이 있다고 가정한다면, 로그인 시에 비밀번호를 확인하기 위해서 입력된 사용자ID에 대한 비밀번호를 검색했을 때, 단 하나의 결과를 얻어야만 올바른 비밀번호를 입력했는지 확인이 가능하다. 만일 하나의 사용자ID에 대해서 두 개 이상의 비밀번호를 얻는다면 어떤 비밀번호가 맞는 것인지 알 수 없다.
+
+![image](https://ifh.cc/g/axNn8S.png)
+
+</br>
+
+예제 11-30 / ch11 / HashMapEx1.java
+
+``` java
+import java.util.*;
+
+public class HashMapEx1 {
+	public static void main(String[] args) {
+		HashMap map = new HashMap();
+		map.put("myId", "1234");
+		map.put("asdf", "1111");
+		map.put("asdf", "1234");
+		
+		Scanner s = new Scanner(System.in);	// 화면으로부터 라인단위로 입력받는다.
+		
+		while(true) {
+			System.out.println("id와 password를 입력해주세요.");
+			System.out.print("id : ");
+			String id = s.nextLine().trim();
+			
+			System.out.print("password : ");
+			String password = s.nextLine().trim();
+			System.out.println();
+			
+			if(!map.containsKey(id)) {
+				System.out.println("입력하신 id는 존재하지 않습니다. 다시 입력해주세요.");
+				continue;
+			}
+			
+			if(!(map.get(id)).equals(password)) {
+				System.out.println("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+			} else {
+				System.out.println("id와 비밀번호가 일치합니다.");
+				break;
+			}
+		}	// while
+	}	// main
+}
+```
+
+```
+id와 password를 입력해주세요.
+id : asdf
+password : 1111
+
+비밀번호가 일치하지 않습니다. 다시 입력해주세요.
+id와 password를 입력해주세요.
+id : asdf
+password : 1234
+
+id와 비밀번호가 일치합니다.
+```
+
+`HashMap`을 생성하고 사용자ID와 비밀번호를 키와 값의 쌍(pair)으로 저장한 다음, 입력된 사용자ID를 키로 `HashMap`에서 검색해서 얻은 값(비밀번호)을 입력된 비밀번호와 비교하는 예제이다.
+
+``` java
+HashMap map = new HashMap();
+map.put("myId", "1234");
+map.put("asdf", "1111");
+map.put("asdf", "1234");
+```
+
+위의 코드는 `HashMap`을 생성하고 데이터를 저장하는 부분인데 이 코드가 실행되고 나면 `HashMap`에는 아래와 같은 형태로 데이터가 저장된다.
+
+![image](https://ifh.cc/g/FHBclF.png)
+
+3개의 데이터 쌍을 저장했지만 실제로는 2개 밖에 저장되지 않은 이유는 중복된 키가 있기 때문이다. 세 번째로 저장한 데이터의 키인 'asdf'는 이미 존재하기 때문에 새로 추가되는 대신 기존의 값을 덮어썼다. 그래서 키 'asdf'에 연결된 값은 '1234'가 된다.
+
+`Map`은 값은 중복을 허용하지만 키는 중복을 허용하지 않기 때문에 저장하려는 두 데이터 중에서 어느 쪽을 키로 할 것인지를 잘 결정해야한다.
+
+> Hashtable은 키(key)나 값(value)으로 null을 허용하지 않지만, HashMap은 허용한다. 그래서 'map.put(null, null);'이나 'map.get(null);'과 같이 할 수 있다.
+
+</br>
+
+예제 11-31 / ch11 / HashMapEx2.java
+
+``` java
+import java.util.*;
+
+public class HashMapEx2 {
+	public static void main(String[] args) {
+		HashMap map = new HashMap();
+		map.put("김자바", new Integer(90));
+		map.put("김자바", new Integer(100));
+		map.put("이자바", new Integer(100));
+		map.put("강자바", new Integer(80));
+		map.put("안자바", new Integer(90));
+		
+		Set set = map.entrySet();
+		Iterator it = set.iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry e = (Map.Entry)it.next();
+			System.out.println("이름 : " + e.getKey() + ", 점수 : " + e.getValue());
+		}
+		
+		set = map.keySet();
+		System.out.println("참가자 명단 : " + set);
+		
+		Collection values = map.values();
+		it = values.iterator();
+		
+		int total = 0;
+		
+		while(it.hasNext()) {
+			Integer i = (Integer)it.next();
+			total += i.intValue();
+		}
+		
+		System.out.println("총점 : " + total);
+		System.out.println("평균 : " + (float)total / set.size());
+		System.out.println("최고점수 : " + Collections.max(values));
+		System.out.println("최저점수 : " + Collections.min(values));
+	}
+}
+```
+
+```
+이름 : 안자바, 점수 : 90
+이름 : 김자바, 점수 : 100
+이름 : 강자바, 점수 : 80
+이름 : 이자바, 점수 : 100
+참가자 명단 : [안자바, 김자바, 강자바, 이자바]
+총점 : 370
+평균 : 92.5
+최고점수 : 100
+최저점수 : 80
+```
+
+`HashMap`의 기본적인 메소드를 이용해서 데이터를 저장하고 읽어오는 예제이다. `entrySet()`을 이용해서 키와 값을 함께 읽어 올 수도 있고 `keySet()`이나 `values()`를 이용해서 키와 값을 따로 읽어 올 수 있다.
+
+</br>
+
+예제 11-32 / ch11 / HashMapEx3.java
+
+``` java
+import java.util.*;
+
+public class HashMapEx3 {
+	static HashMap phoneBook = new HashMap();
+	
+	public static void main(String[] args) {
+		addPhoneNo("친구", "이자바", "010-111-1111");
+		addPhoneNo("친구", "김자바", "010-222-2222");
+		addPhoneNo("친구", "김자바", "010-333-3333");
+		addPhoneNo("회사", "김대리", "010-444-4444");
+		addPhoneNo("회사", "김대리", "010-555-5555");
+		addPhoneNo("회사", "박대리", "010-666-6666");
+		addPhoneNo("회사", "이과장", "010-777-7777");
+		addPhoneNo("세탁", "010-888-8888");
+		
+		printList();
+	}	// main
+	
+	//그룹에 전화번호를 추가하는 메소드
+	static void addPhoneNo(String groupName, String name, String tel) {
+		addGroup(groupName);
+		HashMap group = (HashMap)phoneBook.get(groupName);
+		group.put(tel, name);	// 이름은 중복될 수 있으니 전화번호를 key로 저장한다.
+	}
+	
+	// 그룹을 추가하는 메소드
+	static void addGroup(String groupName) {
+		if(!phoneBook.containsKey(groupName))
+			phoneBook.put(groupName, new HashMap());
+	}
+	
+	static void addPhoneNo(String name, String tel) {
+		addPhoneNo("기타", name, tel);
+	}
+	
+	// 전화번호부 전체를 출력하는 메소드
+	static void printList() {
+		Set set = phoneBook.entrySet();
+		Iterator it = set.iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry e = (Map.Entry)it.next();
+			
+			Set subSet = ((HashMap)e.getValue()).entrySet();
+			Iterator subIt = subSet.iterator();
+			
+			System.out.println(" * " + e.getKey() + "[" + subSet.size() + "]");
+			
+			while(subIt.hasNext()) {
+				Map.Entry subE = (Map.Entry)subIt.next();
+				String telNo = (String)subE.getKey();
+				String name = (String)subE.getValue();
+				System.out.println(name + " " + telNo);
+			}
+			System.out.println();
+		}
+	}	// printList()
+}	// class
+```
+
+```
+ * 기타[1]
+세탁 010-888-8888
+
+ * 친구[3]
+이자바 010-111-1111
+김자바 010-222-2222
+김자바 010-333-3333
+
+ * 회사[4]
+이과장 010-777-7777
+김대리 010-444-4444
+김대리 010-555-5555
+박대리 010-666-6666
+```
+
+`HashMap`은 데이터를 키와 값을 모두 Object타입으로 저장히기 때문에 `HashMap`의 값(value)으로 `HashMap`을 다시 저장할 수 있다. 이렇게 함으로써 하나의 키에 다시 복수의 데이터를 저장할 수 있다.
+
+먼저 전화번호를 저장할 그룹을 만들고 그룹 안에 다시 이름과 전화번호를 저장하도록 했다. 이때 이름대신 전화번호를 키로 사용했다. 이름은 동명이인이 있을 수 있지만 전화번호는 유일하기 때문이다.
+
+</br>
+
+예제 11-33 / ch11 / HashMapEx4.java
+
+``` java
+import java.util.*;
+
+public class HashMapEx4 {
+	public static void main(String[] args) {
+		String[] data = { "A", "K", "A", "K", "D", "K", "A", "K", "K", "K", "Z", "D" };
+		
+		HashMap map = new HashMap();
+		
+		for(int i = 0; i < data.length; i++) {
+			if(map.containsKey(data[i])) {
+				int value = (int)map.get(data[i]);
+				map.put(data[i], value + 1);
+			} else {
+				map.put(data[i], 1);
+			}
+		}
+		
+		Iterator it = map.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry entry = (Map.Entry)it.next();
+			int value = (int)entry.getValue();
+			System.out.println(entry.getKey() + " : " + printBar('#', value) + " " + value);
+		}
+	}	// main
+	
+	public static String printBar(char ch, int value) {
+		char[] bar = new char[value];
+		
+		for(int i = 0; i < bar.length; i++) {
+			bar[i] = ch;
+		}
+		
+		return new String(bar);	// String(char[] chArr)
+	}
+}
+```
+
+```
+A : ### 3
+D : ## 2
+Z : # 1
+K : ###### 6
+```
+
+문자열 배열에 담긴 문자열을 하나씩 읽어서 `HashMap`에 키로 저장하고 값으로 1을 저장한다. `HashMap`에 같은 문자열이 키로 저장되어 있는지 `containsKey()`로 확인하여 이미 저장되어 있는 문자열이면 값을 1증가시킨다.
+
+그리고 그 결과를 `printBar()`를 이용해서 그래프로 표현했다. 이렇게 하면 문자열 배열에 담긴 문자열들의 빈도수를 구할 수 있다.
+
+한정된 범위 내에 있는 순차적인 값들의 빈도수는 배열을 이용하지만, 이처럼 한정되지 않은 범위의 비순차적인 값들의 빈도수는 `HashMap`을 이용해서 구할 수 있다.
+
+> 결과를 통해 HashMap과 같이 해싱을 구현한 컬렉션 클래스들은 저장순서를 유지하지 않는다.
+
+</br>
+
+### 해싱과 해시함수
+
+해싱이란 해시함수(hash function)를 이용해서 데이터를 해시테이블(hash table)에 저장하고 검색하는 기법을 말한다. 해시함수는 데이터가 저장되어 있는 곳을 알려 주기 때문에 다량의 데이터 중에서도 원하는 데이터를 빠르게 찾을 수 있다.
+
+해싱은 구현한 컬렉션 클래스로는 `HashSet`, `HashMap`, `Hashtable` 등이 있다. `Hashtable`은 컬렉션 프레임워크이 도입되면서 `HashMap`으로 대체되었으나 이전 소스와의 호환성 문제로 남겨 두고 있다. 가능하면 `Hashtable`대신 `HashMap`을 사용하는 것이 좋다.
+
+해싱에서 사용하는 자료구조는 다음과 같이 배열과 링크드 리스트의 조합으로 되어 있다.
+
+![image](https://ifh.cc/g/KgSg8s.png)
+
+저장할 데이터의 키를 해시함수에 넣으면 배열의 한 요소를 얻게 되고, 다시 그 곳에 연결되어 있는 링크드 리스트에 저장하게 된다.
+
+이해를 돕기 위해서 실생활에 비유한 예를 하나 들어보겠다. 한 간호사가 많은 환자들의 데이터 중에서, 원하는 환자의 데이터를 쉽게 찾을 수 있는 방법이 없을까를 고민하다가 주민등록번호의 맨 앞자리인 생년을 기준으로 데이터를 분류해서 10개의 서랍(배열)에 나눠 담는 방법을 생객해냈다. 예를 들면 71년생, 72년생과 같은 70년대생 환자들의 데이터는 같은 서랍에 저장된다.
+
+이렇게 분류해서 저장해두면 환자의 주민번호로 태어난 년대를 계산해서 어느 서랍에서 찾아야 할지를 쉽게 알 수 있다.
+
+> 동명이인이 있을 수 있기 때문에 이름보다는 주민등록번호를 키로 사용한다.
+
+![image](https://ifh.cc/g/vPWbzZ.png)
+
+여기서 서랍은 해싱에 사용되는 자료구조 중 배열의 각 요소를 의미하며, 배열의 각 요소에는 링크드 리스트가 저장되어 있어서 실제 데이터는 링크드 리스트에 담겨지게 된다.
+
+아래 그림은 79년생 환자의 주민번호를 키로 해시함수를 통해 7이라는 해시코드를 얻은 다음, 배열의 7번째 요소에 저장된 링크드 리스트에서 원하는 데이터를 검색하는 과정을 표현한 것이다.
+
+![image](https://ifh.cc/g/bhH3LS.png)
+
+① 검색하고자 하는 값의 키로 해시함수를 호출한다.   
+② 해시함수의 계산결과(해시코드)로 해당 값이 저장되어 있는 링크드 리스트를 찾는다.   
+③ 링크드 리스트에서 검색한 키와 일치하는 데이터를 찾는다.
+
+이미 배운 바와 같이 링크드 리스트는 검색에 불리한 자료구조이기 때문에 링크드 리스트의 크기가 커질수록 검색속도가 떨어지게 된다. 이는 하나의 서랍에 데이터의 수가 많을 수록 검색에 시간이 더 걸리는 것과 같다.
+
+반면에 배열은 배열의 크기가 커져도, 원하는 요소가 몇 번째에 있는지만 알면 아래의 공식에 의해서 빠르게 원하는 값을 찾을 수 있다.
+
+> **배열의 인덱스가 n인 요소의 주소 = 배열의 시작주소 + type의 size * n**
+
+그래서 하나의 서랍에 많은 데이터가 저장되어 있는 형태보다는 많은 서랍에 하나의 데이터만 저장되어 있는 형태가 더 빠른 검색결과를 얻을 수 있다.
+
+![image](https://ifh.cc/g/XCdh4v.png)
+
+하나의 링크드 리스트(서랍)에 최소한의 데이터만 저장되려면, 저장된 데이터의 크기를 고려해서 `HashMap`의 크기를 적절하게 지정해주어야 하고, 해시함수가 서로 다른 키(주민번호)에 대해서 중복된 해시코드(서랍위치)의 반환을 최소화해야 한다. 그래야 `HashMap`에서 빠른 검색시간을 얻을 수 있다.
+
+그래서 해싱을 구현하는 과정에서 제일 중요한 것은 해시함수의 알고리즘이며, 이 예에서 사용된 해시함수의 알고리즘은 주어진 키(주민번호)의 첫 번째 문자를 뽑아서 정수로 반환하기만 하면 되므로 아래와 같이 코드로 표현할 수 있다.
+
+``` java
+int hashFunction(String key) {
+	return Integer.parseInt(key.substring(0, 1));
+}
+```
+
+알고리즘이 간단한 만큼 성능이 좋지 않아서 서로 다른 키에 대해서 중복된 해시코드를 반환하는 경우가 많다.
+
+실제로는 `HashMap`과 같이 해싱을 구현한 컬렉션 클래스에서는 `Object`클래스에 정의된 `hashCode()`를 해시함수로 사용한다. `Object`클래스에 정의된 `hashCode()`는 객체의 주소를 이용하는 알고리즘으로 해시코드를 만들어 내기 때문에 모든 객체에 대해 `hashCode()`를 호출한 결과가 서로 유일한 훌륭한 방법이다.
+
+`String`클래스의 경우 `Object`클래스로부터 상속받은 `hashCode()`를 오버라이딩해서 문자열의 내용으로 해시코드를 만들어 낸다. 그래서 서로 다른 `String`인스턴스일지라도 같은 내용의 문자열을 가졌다면 `hashCode()`를 호출하면 같은 해시코드를 얻는다.
+
+`HashSet`에서 설명했던 것과 같이 서로 다른 두 객체에 대해 `equals()`로 비교한 결과가 true인 동시에 `hashCode()`의 반환값이 같아야 같은 객체로 인식한다. `HashMap`에서도 같은 방법으로 객체를 구별하며, 이미 존재하는 키에 대한 값을 저장하면 기존의 값을 새로운 값으로 덮어쓴다.
+
+그래서 새로운 클래스를 정의할 때 `equals()`를 재정의오버라이딩해야 한다면 `hashCode()`도 같이 재정의해서 `equals()`의 결과가 true인 두 객체의 해시코드 `hashCode()`의 결과 값이 항상 같도록 해주어야 한다.
+
+그렇지 않으면 `HashMap`과 같이 해싱을 구현한 컬렉션 클래스에서는 `equals()`의 호출결과가 true지만 해시코드가 다른 두 객체를 서로 다른 것으로 인식하고 따로 저장할 것이다.
+
+> equals()로 비교한 결과가 false이고, 해시코드가 같은 경우는 같은 링크드 리스트(서랍)에 서로 다른 두 데이터가 된다.
