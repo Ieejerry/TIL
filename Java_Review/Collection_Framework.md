@@ -2827,3 +2827,106 @@ int hashFunction(String key) {
 그렇지 않으면 `HashMap`과 같이 해싱을 구현한 컬렉션 클래스에서는 `equals()`의 호출결과가 true지만 해시코드가 다른 두 객체를 서로 다른 것으로 인식하고 따로 저장할 것이다.
 
 > equals()로 비교한 결과가 false이고, 해시코드가 같은 경우는 같은 링크드 리스트(서랍)에 서로 다른 두 데이터가 된다.
+
+</br>
+
+## 1.11 TreeMap
+
+`TreeMap`은 이름에서 알 수 있듯이 이진검색트리의 형태로 키와 값의 쌍으로 이루어진 데이터를 저장한다. 그래서 검색과 정렬에 적합한 컬력션 클래스이다.
+
+검색에 관한 대부분의 경우에서 `HashMap`이 `TreeMap`보다 더 뛰어나므로 `HashMap`을 사용하는 것이 좋다. 다만 범위검색이나 정렬이 필요한 경우에는 `TreeMap`을 사용하는 것이 좋다.
+
+![image](https://ifh.cc/g/DygTsr.png)
+
+</br>
+
+예제 11-34 / ch11 / TreeMapEx1.java
+
+``` java
+import java.util.*;
+
+public class TreeMapEx1 {
+	public static void main(String[] args) {
+		String[] data = { "A", "K", "A", "K", "D", "K", "A", "K", "K", "K", "Z", "D" };
+		
+		TreeMap map = new TreeMap();
+		
+		for(int i = 0; i < data.length; i++) {
+			if(map.containsKey(data[i])) {
+				Integer value = (Integer)map.get(data[i]);
+				map.put(data[i], new Integer(value.intValue() + 1));
+			} else {
+				map.put(data[i], new Integer(1));
+			}
+		}
+		
+		Iterator it = map.entrySet().iterator();
+		
+		System.out.println("= 기본정렬 =");
+		while(it.hasNext()) {
+			Map.Entry entry = (Map.Entry)it.next();
+			int value = ((Integer)entry.getValue()).intValue();
+			System.out.println(entry.getKey() + " : " + printBar('#', value) + " " + value);
+		}
+		System.out.println();
+		
+		// map을 ArrayList로 변환한 다음에 Collections.sort()로 정렬
+		Set set = map.entrySet();
+		List list = new ArrayList(set);	// ArrayList(Collection c)
+		
+		// static void sort(List list, Comparator c)
+		Collections.sort(list, new ValueComparator());
+		
+		it = list.iterator();
+		
+		System.out.println("= 값의 크기가 큰 순서로 정렬 =");
+		while(it.hasNext()) {
+			Map.Entry entry = (Map.Entry)it.next();
+			int value = ((Integer)entry.getValue()).intValue();
+			System.out.println(entry.getKey() + " : " + printBar('#', value) + " " + value);
+		}
+	}	// public static void main(String[] args)
+	
+	static class ValueComparator implements Comparator {
+		public int compare(Object o1, Object o2) {
+			if(o1 instanceof Map.Entry && o2 instanceof Map.Entry) {
+				Map.Entry e1 = (Map.Entry)o1;
+				Map.Entry e2 = (Map.Entry)o2;
+				
+				int v1 = ((Integer)e1.getValue()).intValue();
+				int v2 = ((Integer)e2.getValue()).intValue();
+				
+				return v2 - v1;
+			}
+			return -1;
+		}
+	}	// static class ValueComparator implements Comparator {
+	
+	public static String printBar(char ch, int value) {
+		char[] bar = new char[value];
+		
+		for(int i = 0; i < bar.length; i++) {
+			bar[i] = ch;
+		}
+		return new String(bar);
+	}
+}
+```
+
+```
+= 기본정렬 =
+A : ### 3
+D : ## 2
+K : ###### 6
+Z : # 1
+
+= 값의 크기가 큰 순서로 정렬 =
+K : ###### 6
+A : ### 3
+D : ## 2
+Z : # 1
+```
+
+이 예제는 예제 11-33 HashMapEx4.java를 `TreeMap`을 이용해서 변형한 것인데 `TreeMap`을 사용했기 때문에 HashMapEx4.java의 결과와는 달리 키가 오름차순으로 정렬되어 있는 것을 알 수 있다. 키가 `String`인스턴스이기 때문에 `String`클래스에 정의된 정렬기준에 의해서 정렬된 것이다.
+
+그리고 `Comparator`를 구현한 클래스와 `Collections.sort(List list, Comparator c)`를 이용해서 값에 대한 내림차순으로 정렬하는 방법을 보여준다.
