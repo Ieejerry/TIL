@@ -2930,3 +2930,268 @@ Z : # 1
 이 예제는 예제 11-33 HashMapEx4.java를 `TreeMap`을 이용해서 변형한 것인데 `TreeMap`을 사용했기 때문에 HashMapEx4.java의 결과와는 달리 키가 오름차순으로 정렬되어 있는 것을 알 수 있다. 키가 `String`인스턴스이기 때문에 `String`클래스에 정의된 정렬기준에 의해서 정렬된 것이다.
 
 그리고 `Comparator`를 구현한 클래스와 `Collections.sort(List list, Comparator c)`를 이용해서 값에 대한 내림차순으로 정렬하는 방법을 보여준다.
+
+</br>
+
+## 1.12 Properties
+
+`Properties`는 `HashMap`의 구버전인 `Hashtable`을 상속받아 구현한 것으로, `Hashtable`은 키와 값을 (Object, Object)의 형태로 저장하는데 비해 `Properties`는 (String, String)의 형태로 저장하는 보다 단순화된 컬렉션클래스이다.
+
+주로 애플리케이션의 환경설정과 관련된 속성(property)을 저장하는데 사용되며 데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공한다.
+
+![image](https://ifh.cc/g/Yv7D7r.png)
+
+</br>
+
+예제 11-35 / ch11 / PropertiesEx1.java
+
+``` java
+import java.util.*;
+
+public class PropertiesEx1 {
+	public static void main(String[] args) {
+		Properties prop = new Properties();
+		
+		// prop에 키와 값(key, value)을 저장한다.
+		prop.setProperty("timeout", "30");
+		prop.setProperty("language", "kr");
+		prop.setProperty("size", "10");
+		prop.setProperty("capacity", "10");
+		
+		// prop에 저장된 요소들을 Enumeration을 이용해서 출력한다.
+		Enumeration e = prop.propertyNames();
+		
+		while(e.hasMoreElements()) {
+			String element = (String)e.nextElement();
+			System.out.println(element + "=" + prop.getProperty(element));
+		}
+		
+		System.out.println();
+		prop.setProperty("size", "20");	// size의 값을 20으로 변경한다.
+		System.out.println("size = " + prop.getProperty("size"));
+		System.out.println("capacity = " + prop.getProperty("capacity", "20"));
+		System.out.println("loadfactor = " + prop.getProperty("loadfactor", "0.75"));
+		
+		System.out.println();	// prop에 저장된 요소들을 출력한다.
+		prop.list(System.out);	// prop에 저장된 요소들을 화면(System.out)에 출력한다.
+	}
+}
+```
+
+```
+capacity=10
+size=10
+timeout=30
+language=kr
+
+size = 20
+capacity = 10
+loadfactor = 0.75 ← loadfactor라는 키가 없기 때문에 디폴트 값으로 지정한 0.75가 출력되었다.
+{capacity=10, size=20, timeout=30, language=kr} ← System.out.println(prop);
+-- listing properties --
+size=20
+language=kr
+timeout=30
+capacity=10
+```
+
+`Properties`의 기본적인 메소드를 이용해서 저장하고 읽어오고 출력하는 방법을 보여주는 간단한 예제이다. 데이터를 저장하는데 사용되는 `setProperty()`는 단순히 `Hashtable`의 `put`메소드를 호출할 뿐이다. 그리고 `setProperty()`는 기존에 같은 키로 저장된 값이 있는 경우 그 값을 Object타입으로 반환하며, 그렇지 않을 때는 null을 반환한다.
+
+``` java
+Object setProperty(String key, String value)
+```
+
+`getProperty()`는 `Properties`에 저장된 값을 읽어오는 일을 하는데, 만일 읽어오려는 키가 존재하지 않으면 지정된 기본값(defaultValue)을 반환한다.
+
+``` java
+String getProperty(String key)
+String getProperty(String key, String defaultValue)
+```
+
+`Properties`는 `Hashtable`을 상속받아 구현한 것이라 `Map`의 특성상 저장순서를 유지하지 않기 때문에 예제의 결과에 출력된 순서가 저장순서와는 무관하다.
+
+`Properties`는 컬렉션프레임워크 이전의 구버전이므로 `Iterator`가 아닌 `Enumeration`을 사용한다. 그리고 `list`메소드를 이용하면 `Properties`에 저장된 모든 데이터를 화면 또는 파일에 편리하게 출력할 수 있다.
+
+``` java
+void list(PrintStream out)
+void list(PrintWriter out)
+```
+
+`System.out`은 화면과 연결된 표준출력으로 `System`클래스에 정의된 `PrintStream`타입의 static변수이다.
+
+</br>
+
+예제 11-36 / ch11 / PropertiesEx2.java
+
+``` java
+import java.io.*;
+import java.util.*;
+
+public class PropertiesEx2 {
+	public static void main(String[] args) {
+		// commandline에서 inputfile을 지정해주지 않으면 프로그램을 종료한다.
+		if(args.length != 1) {
+			System.out.println("USAGE : java PropertiesEx2 INPUTFILENAME");
+			System.exit(0);
+		}
+		
+		Properties prop = new Properties();
+		
+		String inputFile = args[0];
+		
+		try {
+			prop.load(new FileInputStream(inputFile));
+		} catch (IOException e) {
+			System.out.println("지정된 파일을 찾을 수 없습니다.");
+			System.exit(0);
+		}
+		
+		String name = prop.getProperty("name");
+		String[] data = prop.getProperty("data").split(",");
+		int max = 0, min = 0;
+		int sum = 0;
+		
+		for(int i = 0; i < data.length; i++) {
+			int intValue = Integer.parseInt(data[i]);
+			
+			if(i == 0) max = min = intValue;
+			
+			if(max < intValue)
+				max = intValue;
+			else if (min > intValue)
+				min = intValue;
+			
+			sum += intValue;
+		}
+		
+		System.out.println("이름 : " + name);
+		System.out.println("최대값 : " + max);
+		System.out.println("최소값 : " + min);
+		System.out.println("합계 : " + sum);
+		System.out.println("평균 : " + (sum * 100.0 / data.length) / 100);
+	}
+}
+```
+
+```
+c:\jdk1.8\work\ch11>java PropertiesEx2 input.txt
+이름 : Lee Hyeonseong
+최대값 : 35
+최소값 : 1
+합계 : 111
+평균 : 11.1
+
+c:\jdk1.8\work\ch11>type input.txt
+# 이것은 주석입니다.
+# 여러 줄도 가능하고요.
+name = Lee Hyeonseong
+data = 9,1,5,2,8,13,26,11,35,1
+
+c:\jdk1.8\work\ch11>
+```
+
+외부파일(input.txt)로부터 데이터를 입력받아서 계산결과를 보여주는 예제이다. 외부파일의 형식은 라인단위로 키와 값이 '='로 연결된 형태이어야 하며 주석라인은 첫 번째 문자가 '#'이어야 한다.
+
+정해진 규칙대로만 파일을 작성하면 `load()`를 호출하는 것만으로 쉽게 데이터를 읽어올 수 있다. 다만 인코딩(encoding)문제로 한글이 깨질 수 있기 때문에 한글을 입력받으려면 아래와 같이 코드를 변경해야한다.
+
+``` java
+String name = prop.getProperty("name");
+
+try {
+	name = new String(name.getBytes("8859_1"), "EUC-KR")
+} catch(Exception e) {}
+```
+
+파일로부터 읽어온 데이터의 인코딩을 라틴문자집합(8859_1)에서 한글완성형(EUC-KR 또는 KSC5601)으로 변환해주는 과정을 추가한 것이다. 우리가 사용하고 있는 OS의 기본 인코딩(encoding)이 유니코드가 아니라서 이런 변환이 필요하다.
+
+> key에 문자 '='를 포함시키고자 한다면 escape문자 '\'를 사용하여 '\='와 같이 표현한다.
+
+</br>
+
+예제 11-37 / ch11 / PropertiesEx3.java
+
+``` java
+import java.util.*;
+import java.io.*;
+
+public class PropertiesEx3 {
+	public static void main(String[] args) {
+		Properties prop = new Properties();
+		
+		prop.setProperty("timeout", "30");
+		prop.setProperty("language", "한글");
+		prop.setProperty("size", "10");
+		prop.setProperty("capacity", "10");
+		
+		try {
+			prop.store(new FileOutputStream("output.txt"), "Properties Example");
+			prop.storeToXML(new FileOutputStream("output.xml"), "Properties Example");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	// main의 끝
+}
+```
+
+```
+#Properties Example
+#Mon Nov 13 17:57:05 KST 2022
+capacity=10
+size=10
+timeout=30
+language=\uD55C\uAE00 ← 한글이 unicode로 바뀌어 있다.
+```
+
+```
+<?xml version="1.0" encoding="UTF-8" standalone="nos"?>
+<!DOCTYPE properties SYSTEM "http://java.usun.com/dtd/properties.dtd">
+<properties>
+<comment>Properties Example</comment>
+<entry key="capacity">10</entry>
+<entry key="size">10</entry>
+<entry key="timeout">30</entry>
+<entry key="language">한글</entry> ← 한글이 그래도 저장되어 있다.(메모장에서는 괜찮은데, 도스창에서는 글자가 깨져 보인다.)
+</properties>
+```
+
+이전 예제와는 반대로 `Properties`에 저장된 데이터를 `store()`와 `storeToXML()`를 이용해서 파일로 저장하는 방법을 보여 준다. 여기서도 한글문제가 발생하는데 `storeToXML()`로 저장한 XML은 Editplus나 Eclipse에서 한글편집이 가능하므로 데이터에 한글이 포함된 경우 `store()`보다는 `storeToXML`을 이용해서 XML로 저장하는 것이 좋다.
+
+</br>
+
+예제 11-38 / ch11 / PropertiesEx4.java
+
+``` java
+import java.util.*;
+
+public class PropertiesEx4 {
+	public static void main(String[] args) {
+		Properties sysProp = System.getProperties();
+		System.out.println("java.version : " + sysProp.getProperty("java.version"));
+		System.out.println("user.language : " + sysProp.getProperty("user.language"));
+		sysProp.list(System.out);
+	}
+}
+```
+
+```
+java.version : 17.0.3
+user.language : ko
+-- listing properties --
+java.specification.version=17
+sun.cpu.isalist=amd64
+sun.jnu.encoding=MS949
+java.class.path=C:\Users\iksrnd\git\Java_jungsuk_exam...
+java.vm.vendor=Eclipse Adoptium
+sun.arch.data.model=64
+...중간 생략...
+java.vm.info=mixed mode
+java.vendor=Eclipse Adoptium
+java.vm.version=17.0.3+7
+sun.io.unicode.encoding=UnicodeLittle
+java.class.version=61.0
+...
+```
+
+시스템 속성을 가져오는 방법을 보여주는 예제이다. `System`클래스의 `getProperties()`를 호출하면 시스템과 관련된 속성이 저장된 `Properties`를 가져올 수 있다. 이 주엥서 원하는 속성을 `getProperties()`를 통해 얻을 수 있다.
+
+> 결과 중에 내용이 길어서 '...'로 생략된 값들이 있는데, getProperty()를 이용해서 출력하면 생략되지 않은 전체 값을 얻을 수 있다.
