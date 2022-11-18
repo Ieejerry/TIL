@@ -3195,3 +3195,183 @@ java.class.version=61.0
 시스템 속성을 가져오는 방법을 보여주는 예제이다. `System`클래스의 `getProperties()`를 호출하면 시스템과 관련된 속성이 저장된 `Properties`를 가져올 수 있다. 이 주엥서 원하는 속성을 `getProperties()`를 통해 얻을 수 있다.
 
 > 결과 중에 내용이 길어서 '...'로 생략된 값들이 있는데, getProperty()를 이용해서 출력하면 생략되지 않은 전체 값을 얻을 수 있다.
+
+</br>
+
+## 1.13 Collections
+
+`Arrays`가 배열과 관련된 메소드를 제공하는 것처럼, `Collections`는 컬렉션과 관련된 메소드를 제공한다. `fill()`, `copy()`, `binarySearch()` 등의 메소드는 두 클래스에 모두 포함되어 있으며 같은 기능을 한다.
+
+> java.util.Collection은 인터페이스이고, java.util.Collections는 클래스이다.
+
+</br>
+
+### 컬렉션의 동기화
+
+멀티 쓰레드(multi-thread) 프로그래밍에서는 하나의 객체를 여러 쓰레드가 동시에 접근할 수 있기 때문에 데이터의 일관성(consistency)을 유지하기 위해서는 공유되는 객체에 동기화(synchronization)가 필요하다.
+
+`Vector`와 `Hashtable`과 같은 구버전(JDK1.2 이전)의 클래스들은 자체적으로 동기화 처리가 되어 있는데, 멀티쓰레드 프로그래밍이 아닌 경우에는 불필요한 기능이 되어 성능을 떨어뜨리는 요인이 된다.
+
+그래서 새로 추가된 `ArrayList`와 `HashMap`과 같은 컬렉션은 동기화를 자체적으로 처리하지 않고 필요한 경우에만 `java.util.Collections`클래스의 동기화 메소드를 이용해서 동기화처리가 가능하도록 변경하였다.
+
+`Collections`클래스에는 다음과 같은 동기화 메소드를 제공하고 있으므로, 동기화가 필요할 때 해당하는 것을 사용하면 된다.
+
+``` java
+static Collection synchronizedCollection(Collection c)
+static List synchronizedList(List list)
+static Set synchronizedSet(Set set)
+static Map synchronizedMap(Map map)
+static SortedSet synchronizedSortedSet(SortedSet s)
+static SortedMap synchronizedSortedMap(SortedMap m)
+```
+
+이 들을 사용하는 방법은 다음과 같다.
+
+``` java
+List syncList = Collections.synchronizedList(new ArrayList(...));
+```
+
+</br>
+
+### 변경불가 컬렉션 만들기
+
+컬렉션에 저장된 데이터를 보호하기 위해서 컬렉션을 변경할 수 없게, 즉 읽기전용으로 만들어야 할 때가 있다. 주로 멀티 쓰레드 프로그래밍에서 여러 쓰레드가 하나의 컬렉션을 공유하다보면 데이터가 손상될 수 있는데, 이를 방지하려면 아래의 메소드들을 이용해야 한다.
+
+``` java
+static Collection unmodifiableCollection(Collection c)
+static List unmodifiableList(List list)
+static Set unmodifiableSet(Set set)
+static Map unmodifiableMap(Map map)
+static NavigableSet unmodifiableNavigableSet(NavigableSet s)
+static SortedSet unmodifiableSortedSet(SortedSet s)
+static NavigableMap unmodifiableNavigableMap(NavigableMap m)
+static SortedMap unmodifiableSortedMap(SortedMap m)
+```
+
+</br>
+
+### 싱글톤 컬렉션 만들기
+
+단 하나의 객체만을 저장하는 컬렉션을 만들고 싶을 경우가 있다. 이럴 때는 아래의 메소드를 사용하면 된다.
+
+``` java
+static List singletonList(Object o)
+static Set singletonSet(Object o)	// singletonSet이 아님
+static Map singletonMap(Object key, Object value)
+```
+
+매개변수로 저장할 요소를 지정하면, 해당 요소를 저장하는 컬렉션을 반환한다. 그리고 반환된 컬렉션은 변경할 수 없다.
+
+</br>
+
+### 한 종류의 객체만 저장하는 컬렉션 만들기
+
+컬렉션에 모든 종류의 객체를 저장할 수 있다는 것은 장점이기도 하고 단점이기도 하다. 대부분의 경우 한 종류의 객체를 저장하며, 컬렉션에 지정된 종류의 객체만 저장할 수 있도록 제한하고 싶을 때 아래의 메소드를 사용한다.
+
+``` java
+static Collection checkedCollection(Collection c, Class type)
+static List checkedList(List list, Class type)
+static Set checkedSet(Set s, Class type)
+static Map checkedMap(Map m, Class keyType, Class valueType)
+static Queue checkedQueue(Queue queue, Class type)
+static NavigableSet checkedNavigableSet(NavigableSet s, Class type)
+static SortedSet checkedSortedSet(SortedSet s, Class type)
+static NavigableMap checkedNavigableMap(NavigableMap m, Class keyType, Class valueType)
+static SortedMap checkedSortedMap(SortedMap m, Class keyType, Class valueType)
+```
+
+사용방법은 다음과 같이 두 번째 매개변수에 저장할 객체의 클래스를 지정하면 된다.
+
+``` java
+List list = new ArrayList();
+List checkedList = checkedList(list, String.class);	// String만 저장가능
+checkedList.add("abc");	// OK.
+checkedList.add(new Integer(3));	// 에러. ClassCastException 발생
+```
+
+컬렉션에 저장할 요소의 타입을 제한하는 것은 제네릭스(generics)로 간단히 처리할 수 있는데도 이런 메소드들을 제공하는 이유는 호환성 때문이다.
+
+제네릭스는 JDK1.5부터 도입된 기능으로 JDK1.5이전에 작성된 코드를 사용할 때는 이 메소드들이 필요할 수 있다.
+
+</br>
+
+예제 11-39 / ch11 / CollectionsEx.java
+
+``` java
+import java.util.*;
+import static java.util.Collections.*;
+
+public class CollectionsEx {
+	public static void main(String[] args) {
+		List list = new ArrayList();
+		System.out.println(list);
+		
+		addAll(list, 1,2,3,4,5);
+		System.out.println(list);
+		
+		rotate(list, 2);	// 오른쪽으로 두 칸씩 이동
+		System.out.println(list);
+		
+		swap(list, 0, 2);	// 첫 번째와 세 번째를 교환(swap)
+		System.out.println(list);
+		
+		shuffle(list);	// 저장된 요소의 위치를 임의로 변경
+		System.out.println(list);
+		
+		sort(list, reverseOrder());	// 역순 정렬 reverse(list);와 동일
+		System.out.println(list);
+		
+		sort(list);	// 정렬
+		System.out.println(list);
+		
+		int idx = binarySearch(list, 3);	// 3이 저장된 위치(index)를 반환
+		System.out.println("index of 3 = " + idx);
+		
+		System.out.println("max = " + max(list));
+		System.out.println("min = " + min(list));
+		System.out.println("min = " + max(list, reverseOrder()));
+		
+		fill(list, 9);	// list를 9로 채운다.
+		System.out.println("list = " + list);
+		
+		// list와 같은 크기의 새로운 list를 생성하고 2로 채운다. 단, 결과는 변경불가
+		List newList = nCopies(list.size(), 2);
+		System.out.println("newList = " + newList);
+		
+		System.out.println(disjoint(list, newList));	// 공통요소가 없으면 true
+		
+		copy(list, newList);
+		System.out.println("newList = " + newList);
+		System.out.println("list = " + list);
+		
+		replaceAll(list, 2, 1);
+		System.out.println("list = " + list);
+		
+		Enumeration e = enumeration(list);
+		ArrayList list2 = list(e);
+		
+		System.out.println("list2 = " + list2);
+	}
+}
+```
+
+```
+[]
+[1, 2, 3, 4, 5]
+[4, 5, 1, 2, 3]
+[1, 5, 4, 2, 3]
+[3, 2, 5, 4, 1]
+[5, 4, 3, 2, 1]
+[1, 2, 3, 4, 5]
+index of 3 = 2
+max = 5
+min = 1
+min = 1
+list = [9, 9, 9, 9, 9]
+newList = [2, 2, 2, 2, 2]
+true
+newList = [2, 2, 2, 2, 2]
+list = [2, 2, 2, 2, 2]
+list = [1, 1, 1, 1, 1]
+list2 = [1, 1, 1, 1, 1]
+```
