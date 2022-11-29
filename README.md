@@ -90,3 +90,4 @@
 - [java.time패키지](https://github.com/leehenson/TIL/blob/master/Java_Review/java.time_package.md)
 - [Collection Framework](https://github.com/leehenson/TIL/blob/master/Java_Review/Collection_Framework.md)
 - [제네릭스](https://github.com/leehenson/TIL/blob/master/Java_Review/Generics.md)
+- [열거형](https://github.com/leehenson/TIL/blob/master/Java_Review/Enums.md)
