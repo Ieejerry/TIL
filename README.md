@@ -96,3 +96,4 @@
 - [쓰레드의 구현과 실행](https://github.com/leehenson/TIL/blob/master/Java_Review/Implementation_and_execution_of_thread.md)
 - [start()와 run()](https://github.com/leehenson/TIL/blob/master/Java_Review/start()_and_run().md)
 - [싱글쓰레드와 멀티쓰레드](https://github.com/leehenson/TIL/blob/master/Java_Review/Single_Thread_and_Multi_Thread.md)
+- [쓰레드의 우선순위](https://github.com/leehenson/TIL/blob/master/Java_Review/Priority_of_Thread.md)
