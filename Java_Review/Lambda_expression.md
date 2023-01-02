@@ -630,3 +630,162 @@ IntFunction<Integer> f = (a) -> 2 * a;
 ```
 
 `IntFunction`, `ToIntFunction`, `IntToLongFunction`은 있어도 `IntToIntFunction`은 없는데, 그 이유는 `IntUnaryOperator`가 그 역할을 하기 때문이다. 매개변수의 타입과 반환타입이 일치할 때는 앞서 배운 것처럼 `Function`대신 `UnaryOperator`을 사용해야한다.
+
+</br>
+
+## 1.5 Function의 합성과 Predicate의 결합
+
+`java.util.function`패키지의 함수형 인터페이스에는 추상메소드 외에도 디폴트 메소드와 static 메소드가 정의되어 있다. `Function`과 `Predicate`에 정의된 메소드에 대해서만 살펴보겠다. 그 이유는 다른 함수형 인터페이스의 메소드도 유사하기 때문이다.
+
+> 원래 Function인터페이스는 반드시 두 개의 타입을 지정해 줘야하기 때문에, 두 타입이 같아도 Function<T>라고 쓸 수 없다. Function<T, T>라고 써야 한다.
+
+``` java
+Function
+default <V> Function<T, V> andThen(Function<? super R, ? extends V> after)
+default <V> Function<V, R> compose(Function<? super V, ? extends T> before)
+static <T> Function<T, T> identity()
+
+Predicate
+default Predicate<T> and(Predicate<? super T> other)
+default Predicate<T> or(Predicate<? super T> other)
+default Predicate<T> negate()
+static <T> Predicate<T> isEqual(Object targetRef)
+```
+
+</br>
+
+### Function의 합성
+
+수학에서 두 함수를 합성해서 하나의 새로운 함수를 만들어낼 수 있다는 것처럼, 두 람다식을 합성해서 새로운 람다식을 만들 수 있다. 두 함수의 합성은 어느 함수를 먼저 적용하느냐에 따라 달리진다. 함수 `f`, `g`가 있을 때, `f,andThen(g)`는 함수 `f`를 먼저 적용하고, 그 다음에 함수 `g`를 적용한다. 그리고 `f.compose(g)`는 반대로 `g`를 먼저 적용하고 `f`를 적용한다.
+
+![image](https://ifh.cc/g/2nsSVH.png)
+
+</br>
+
+![image](https://ifh.cc/g/CnhVPV.png)
+
+예를 들어, 문자열을 숫자로 변환하는 함수 `f`와 숫자를 2진 문자열로 변환하는 함수 `g`를 `andThen()`으로 합성하여 새로운 함수 `h`를 만들어낼 수 있다.
+
+``` java
+Function<String, Integer> f = (s) -> Integer.parseInt(s, 16);
+Function<Integer, String> g = (i) -> Integer.toBinaryString(i);
+Function<String, String> h = f.andThen(g);
+```
+
+함수 `h`의 제네릭 타입이 `<String, String>`이다. 즉, String을 입력받아서 String을 결과로 반환한다. 예를 들어 함수 `h`에 문자열 "FF"를 입력하면, 결과로 "11111111"을 얻는다.
+
+![image](https://ifh.cc/g/4sKrxR.png)
+
+이번엔 `compose()`를 이용해서 두 함수를 반대의 순서로 합성해보겠다.
+
+``` java
+Function<Integer, String> g = (i) -> Integer.toBinaryString(i);
+Function<String, Integer> f = (s) -> Integer.parseInt(s, 16);
+Function<Integer, Integer> h = f.compose(g);
+```
+
+이전과 달리 함수 `h`의 제네릭 타입이 `<Integer, Integer>`이다. 함수 `h`에 숫자 2를 입력하면, 결과로 16을 얻는다.
+
+> 함수 f는 "10"을 16진수로 인식하기 때문에 16을 결과로 얻는다.
+
+![image] (https://ifh.cc/g/5lGMLK.png)
+
+그리고 `identity()`는 함수를 적용하기 이전과 이후가 동일한 '항등 함수'가 필요할 때 사용한다. 이 함수를 람다식으로 표현하면 `x -> x`이다. 아래의 두 문장은 동등하다.
+
+> 항등 함수는 함수에 x를 대입하면 결과가 x인 함수를 말한다. f(x) = x
+
+``` java
+    Function<String, String> f = x -> x;
+//  Function<String, String> f = Function.identity();   // 위의 문장과 동일
+
+    System.out.println(f.apply("AAA")); // AAA가 그대로 출력됨
+```
+
+항등 함수는 잘 사용되지 않는 편이며, 나중에 배울 `map()`으로 변환작업할 때, 변환없이 그대로 처리하고자할 때 사용된다.
+
+</br>
+
+### Predicate의 결합
+
+여러 조건식을 논리 연산자인 &&(and), ||(or), !(not)으로 연결해서 하나의 식을 구성할 수 있는 것처럼, 여러 `Predicate`를 `and()`, `or()`, `negate()`로 연결해서 하나의 새로운 `Predicate`로 결합할 수 있다.
+
+``` java
+Predicate<Integer> p = i -> i < 100;
+Predicate<Integer> q = i -> i < 200;
+Predicate<Integer> r = i -> i % 2 == 0;
+Predicate<Integer> notP = p.negate();   // i >= 100
+
+// 100 <= i && (i < 200 || i % 2 == 0)
+Predicate<Integer> all = notP.and(q.or(r));
+System.out.println(all.test(150));  // true
+```
+
+이처럼 `and()`, `or()`, `negate()`로 여러 조건식을 하나로 합칠 수 있다. 물론 아래와 같이 람다식을 직접 넣어도 된다.
+
+``` java
+Predicate<Integer> all = notP.and(i -> i < 200>).or(i -> i % 2 == 0);
+```
+
+> Predicate의 끝에 negate()를 붙이면 조건식 전체가 부정이 된다.
+
+그리고 static메소드인 `isEqual()`은 두 대상을 비교하는 `Predicate`를 만들 때 사용한다. 먼저, `isEqual()`의 매개변수로 비교대상을 하나 지정하고, 또 다른 비교대상은 `test()`의 매개변수로 지정한다.
+
+``` java
+Predicate<String> p = Predicate.isEqual(str1);
+boolean result = p.test(str2);  // str1과 str2가 같은지 비교하여 결과를 반환
+```
+
+위의 두 문장을 합치면 아래와 같다. 오히려 아래의 문장이 이해하기 더 쉽다.
+
+``` java
+// str1과 str2가 같은지 비교
+boolean result = Predicate.isEqual(str1).test(str2);
+```
+
+</br>
+
+예제 14-7 / ch14 / LambdaEx7.java
+
+``` java
+import java.util.function.*;
+
+public class LambdaEx7 {
+	public static void main(String[] args) {
+		Function<String, Integer> f = (s) -> Integer.parseInt(s, 16);
+		Function<Integer, String> g = (i) -> Integer.toBinaryString(i);
+		
+		Function<String, String> h = f.andThen(g);
+		Function<Integer, Integer> h2 = f.compose(g);
+		
+		System.out.println(h.apply("FF"));	// "FF" → 255 → "11111111"
+		System.out.println(h2.apply(2));	// 2 → "10" → 16
+		
+		Function<String, String> f2 = x -> x;	// 항등 함수(identity function)
+		System.out.println(f2.apply("AAA"));	// AAA가 그대로 출력됨
+		
+		Predicate<Integer> p = i -> i < 100;
+		Predicate<Integer> q = i -> i < 200;
+		Predicate<Integer> r = i -> i % 2 == 0;
+		Predicate<Integer> notP = p.negate();	// i >= 100
+		
+		Predicate<Integer> all = notP.and(q.or(r));
+		System.out.println(all.test(150));	// true
+		
+		String str1 = "abc";
+		String str2 = "abc";
+		
+		// str1과 str2가 같은지 비교한 결과를 반환
+		Predicate<String> p2 = Predicate.isEqual(str1);
+		boolean result = p2.test(str2);
+		System.out.println(result);
+	}
+}
+```
+
+```
+11111111
+16
+AAA
+true
+true
+```
