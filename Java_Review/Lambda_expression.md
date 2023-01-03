@@ -789,3 +789,93 @@ AAA
 true
 true
 ```
+
+</br>
+
+## 1.6 메소드 참조
+
+람다식이 하나의 메소드만 호출하는 경우에는 '메소드 참조(method reference)'라는 방법으로 람다식을 간략히 할 수 있다. 예를 들어 문자열을 정수로 변환하는 람다식은 아래와 같이 작성할 수 있다.
+
+``` java
+Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+```
+
+보통은 이렇게 람다식을 작성하는데, 이 람다식을 메소드로 표현하면 아래와 같다.
+
+> 람다식은 엄밀히 말하자면 익명클래스의 객체지만 간단히 메소드가 적었다.
+
+``` java
+Integer wrapper(String s) { // 이 메소드의 이름은 의미없다.
+    return Integer.parseInt(s);
+}
+```
+
+이 `wrapper`메소드는 별로 하는 일이 없다. 그저 값을 받아서 `Integer.parseInt()`에게 넘겨주는 일만 할 뿐이다.
+
+``` java
+Function<String, Integer> f = (String s) -> Integer.parseInt(s);
+                                ↓
+Function<String, Integer> f = Integer::parseInt;    // 메소드 참조
+```
+
+위 메소드 참조에서 람다식의 일부가 생략되었지만, 컴파일러는 생략된 부분을 우변의 `parseInt`메소드의 선언부로부터, 또는 좌변의 `Function`인터페이스에 지정된 제네릭 타입으로부터 쉽게 알아낼 수 있다.
+
+한 가지 예를 더 들어보겠다. 아래의 람다식을 메소드 참조조 변경하겠다.
+
+``` java
+BiFunction<String, String, Boolean> f = (s1, s2) -> s1.equals(s2);
+```
+
+참조변수의 `f`의 타입만 봐도 람다식이 두 개의 String타입의 매개변수를 받는다는 것을 알 수 있으므로, 람다식의 매개변수들은 없어도 된다. 위의 람다식에서 매개변수들을 제거해서 메소드 참조로 변경하면 아래와 같다.
+
+``` java
+BiFunction<String, String, Boolean> f = (s1, s2) -> s1.equals(s2);
+                                ↓
+BiFunction<Stirng, String, Boolean> f = String::equals; // 메소드 참조
+```
+
+매개변수 `s1`과 `s2`를 생략해버리고 나면 `equals`만 남는데, 두 개의 String을 받아서 Boolean을 반환하는 `equals`라는 이름의 메소드는 다른 클래스에도 존재할 수 있기 때문에 `equals`앞에 클래스 이름은 반드시 필요하다.
+
+메소드 참조를 사용할 수 있는 경우가 한 가지 더 있는데, 이미 생성된 객체의 메소드를 람다식에서 사용한 경우에는 클래스 이름 대신 그 객체의 참조변수를 직어줘야 한다.
+
+``` java
+MyClass = obj = new MyClass();
+Function<String, Boolean> f = (x) -> obj.equals(x); // 람다식
+Function<String, Boolean> f2 = obj::equals; // 메소드 참조
+```
+
+지금까지 3가지 경우의 메소드 참조에 대해서 알아봤는데, 정리하면 다음과 같다.
+
+![image](https://ifh.cc/g/jrGsWp.png)
+
+> 하나의 메소드만 호출하는 람다식은 '클래스이름::메소드이름' 또는 '참조변수::메소드이름'으로 바꿀 수 있다.
+
+</br>
+
+### 생성자의 메소드 참조
+
+생성자를 호출하는 람다식도 메소드 참조로 변환할 수 있다.
+
+``` java
+Supplier<MyClass> s = () -> new MyClass();  // 람다식
+Supplier<MyClass> s = MyClass::new; // 메소드 참조
+```
+
+매개변수가 있는 생성자라면, 매개변수의 개수에 따라 알맞은 함수형 인터페이스를 사용하면 된다. 필요하다면 함수형 인터페이스를 새로 정의해야 한다.
+
+``` java
+Function<Integer, MyClass> f = (i) -> new MyClass();    // 람다식
+Function<Integer, MyClass> f2 = MyClass::new;   // 메소드 참조
+
+BiFunction<Integer, String, MyClass> bf = (i, s) -> new MyClass(i, s);
+BiFunction<Integer, String, MyClass> bf2 = MyClass::new;    // 메소드 참조
+```
+
+그리고 배열을 생성할 때는 아래와 같이 하면 된다.
+
+``` java
+Function<Integer, int[]> f = x -> new int[x];   // 람다식
+Function<Integer, int[]> f2 = int[]::new;   // 메소드 참조
+```
+
+메소드 참조는 람다식을 마치 static변수처럼 다룰 수 있게 해준다. 메소드 참조는 코드를 간략히 하는데 유용해서 많이 사용된다.
