@@ -377,3 +377,646 @@ Stream<String> strs1 = Stream.of(str1);
 Stream<String> strs2 = Stream.of(str2);
 Stream<String> strs3 = Stream.concat(strs1, strs2); // 두 스트림을 하나로 연결
 ```
+
+</br>
+
+## 2.3 스트림의 중간연산
+
+</br>
+
+### 스트림 자르기 - skip(), limit()
+
+`skip()`과 `limit()`은 스트림의 일부를 잘라낼 때 사용하며, `skip(3)`은 처음 3개의 요소를 건너뛰고, `limit(5)`는 스트림의 요소를 5개로 제한한다.
+
+``` java
+Stream<T> skip(long n)
+Stream<T> limit(long maxSize)
+```
+
+예를 들어 10개의 요소를 가진 스트림에 `skip(3)`과 `limit(5)`을 순서대로 적용하면 4번째 요소부터 5개의 요소를 가진 스트림이 반환된다.
+
+``` java
+IntStream intStream - IntStream.rangeClosed(1, 10); // 1~10의 요소를 가진 스트림
+intStream.skip(3).limit(5).forEach(System.out::println);    // 45678
+```
+
+기본형 스트림에도 `skip()`과 `limit()`이 정의되어 있는데, 반환 타입이 기본형 스트림이라는 점만 다르다.
+
+``` java
+IntStream skip(long n)
+IntStream limit(long maxSize)
+```
+
+</br>
+
+### 스트림의 요소 걸러내기 - filter(), distinct()
+
+`distinct()`는 스트림에서 중복된 요소들을 제거하고, `filter()`는 주어진 조건(Predicate)에 맞지 않는 요소를 걸러낸다.
+
+``` java
+Stream<T> filter(Predicate<? super T> predicate)
+Stream<T> distinct()
+```
+
+`distinct()`의 사용 방법은 간단하다.
+
+``` java
+IntStream intStream = IntStream.of(1, 2, 2, 3, 3, 3, 4, 5, 5, 6);
+intStream.distinct().forEach(System.out::println);  //12345
+```
+
+`filter()`는 매개변수로 `Predicate`를 필요로 하는데, 아래와 같이 연산결과가 boolean이니 람다식을 사용해도 된다.
+
+``` java
+IntStream intStream = IntStream.rangeClosed(1, 10); // 1~10
+intStream.filter(i -> i % 2 == 0).forEach(System.out::print);   // 246810
+```
+
+필요하다면 `filter()`를 다른 조건으로 여러 번 사용할 수도 있다.
+
+``` java
+// 아래의 두 문장은 동일한 결과를 얻는다.
+intStream.filter(i -> i % 2 != 0 && i % 3 != 0).forEach(System.out::print); // 157
+intStream.filter(i -> i % 2 != 0).filter(i -> i % 3 == 0).forEach(System.out::print);
+```
+
+</br>
+
+### 정렬 - sorted()
+
+스트림에 정렬할 때는 `sorted()`를 사용하면 된다.
+
+``` java
+Stream<T> sorted()
+Stream<T> sorted(Comparator<? super T> comparator)
+```
+
+`sorted()`는 지정된 `Comparator`로 스트림을 정렬하는데, `Comparator` 대신 int값을 반환하는 람다식을 사용하는 것도 가능하다. `Comparator`를 지정하지 않으면 스트림 요소의 기본 정렬 기준(Comparable)으로 정렬한다. 단, 스트림의 요소가 `Comparable`을 구현한 클래스가 아니면 예외가 발생한다.
+
+``` java
+Stream<String> strStream = Stream.of("dd", "aaa", "CC", "cc", "b");
+strStream.sorted().forEach(System.out::print);  // CCaaabccdd
+```
+
+위의 코드는 문자열 스트림에 String에 정의된 기본 정렬(사전순 정렬)로 정렬해서 출력한다. 아래의 표는 위의 문자열 스트림(strStream)을 다양한 방법으로 정렬한 후에 `forEach(System.out::print)`로 출력한 결과를 보여준다.
+
+> String.CASE_INSENSITIVE_ORDER는 String클래스에 정의된 Comparator이다.
+
+![image](https://ifh.cc/g/ph59Ln.png)
+
+JDK1.8부터 `Comparator`인터페이스에 static메소드와 디폴트 메소드가 많이 추가되었는데, 이 메소드들을 이용하면 정렬이 쉬워진다. 이 메소드들은 모두 `Comparator<T>`를 반환하며, 아래의 메소드 목록은 제네릭에서 와일드 카드를 제거하여 간단히 한 것이다.
+
+Comparator의 default메소드
+
+``` java
+reversed()
+thenComparing(Comparator<T> other)
+thenComparing(Function<T, U> keyExtractor)
+thenComparing(Function<T, U> keyExtractor, Comparator<U> keyComp)
+thenComparingInt(ToIntFunction<T> keyExtractor)
+thenComparingLong(ToLongFunction<T> keyExtractor)
+thenComparingDouble(ToDoubleFunction<T> keyExtractor)
+```
+
+Comparator의 static메소드
+
+``` java
+naturalOrder()
+reverseOrder()
+comparing(Function<T, U> keyExtractor)
+comparing(Function<T, U> keyExtractor, Comparator<U> keyComparator)
+comparingInt(ToIntFunction<T> keyExtractor)
+comparingLong(ToLongFunction<T> keyExtractor)
+comparingDouble(ToDoubleFunction<T> keyExtractor)
+nullsFirst(Comparator<T> comparator)
+nullsLast(Comparator<T> comparator)
+```
+
+정렬에 사용되는 메소드의 개수가 많지만, 가장 기본적인 메소드는 `comparing()`이다.
+
+``` java
+comparing(Function<T, U> keyExtractor)
+comparing(Function<T, U> keyExtractor, Comparator<U> keyComparator)
+```
+
+스트림의 요소가 `Comparable`을 구현한 경우, 매개변수 하나짜리를 사용하면 되고, 그렇지 않은 경우, 추가적인 매개변수로 정렬기준(Comparator)을 따로 지정해 줘야한다.
+
+``` java
+comparingInt(ToIntFunction<T> keyExtractor)
+comparingLong(ToLongFunction<T> keyExtractor)
+comparingDouble(ToDoubleFunction<T> keyExtractor)
+```
+
+비교대상이 기본형인 경우, `comparing()`대신 위의 메소드를 사용하면 오토박싱과 언박싱과정이 없어서 더 효율적이다. 그리고 정렬 조건을 추가할 때는 `thenComparing()`을 사용한다.
+
+``` java
+thenComparing(Comparator<T> other)
+thenComparing(Function<T, U> keyExtractor)
+thenComparing(Function<T, U> keyExtractor, Comparator<U> keyComp)
+```
+
+예를 들어 학생 스트림(studentStream)을 반(ban)별, 성적(totalScore)순, 그리고 이름(name)순으로 정렬하여 출력하려면 다음과 같이 한다.
+
+``` java
+studentStream.sorted(Comparator.comparing(Student::getBan)
+                            .thenComparing(Student::getTotalScore)
+                            .thenComparing(Student::getName))
+                            .forEach(System.out::println);
+```
+
+다음 예제는 학생의 성적을 반별 오름차순, 총점별 내림차순으로 정렬하여 출력한다.
+
+</br>
+
+예제 14-8 / ch14 / StreamEx1.java
+
+``` java
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamEx1 {
+	public static void main(String[] args) {
+		Stream<Student> studentStream = Stream.of(
+					new Student("이자바", 3, 300),
+					new Student("김자바", 1, 200),
+					new Student("안자바", 2, 100),
+					new Student("박자바", 2, 150),
+					new Student("소자바", 1, 200),
+					new Student("나자바", 3, 290),
+					new Student("감자바", 3, 180)
+				);
+		
+		studentStream.sorted(Comparator.comparing(Student::getBan)	// 반별 정렬
+				.thenComparing(Comparator.naturalOrder()))	// 기본 정렬
+				.forEach(System.out::println);
+	}
+}
+
+class Student implements Comparable<Student> {
+	String name;
+	int ban;
+	int totalScore;
+	Student(String name, int ban, int totalScore) {
+		this.name = name;
+		this.ban = ban;
+		this.totalScore = totalScore;
+	}
+	
+	public String toString() {
+		return String.format("[%s, %d, %d]", name, ban, totalScore);
+	}
+	
+	String getName() { return name; }
+	int getBan() { return ban; }
+	int getTotalScore() { return totalScore; }
+	
+	// 총점 내림차순을 기본 정렬로 한다.
+	public int compareTo(Student s) {
+		return s.totalScore - this.totalScore;
+	}
+}
+```
+
+```
+[김자바, 1, 200]
+[소자바, 1, 200]
+[박자바, 2, 150]
+[안자바, 2, 100]
+[이자바, 3, 300]
+[나자바, 3, 290]
+[감자바, 3, 180]
+```
+
+학생 성적 정보를 요소로 하는 `Stream<Student>`을 반별로 정렬한 다음에, 총점별 내림차순으로 정렬한다. 정렬하는 코드를 짧게 하려고, `Comparable`을 구현해서 총점별 내림차순 정렬이 `Student`클래스의 기본 정렬이 되도록 했다.
+
+``` java
+studentStream.sorted(Comparator.comparing(Student::getBan)  // 반별 정렬
+                .thenComparing(Comparator.naturalOrder()))  // 기본 정렬
+                .forEach(System.out::println);
+```
+
+</br>
+
+### 변환 - map()
+
+스트림의 요소에 저장된 값 중에서 원하는 필드만 뽑아내거나 특정 형태로 변환해야 할 때 사용하는 것이 바로 `map()`이다. 이 메소드의 선언부는 아래와 같으며, 매개변수로 T타입을 R타입으로 변환해서 반호나하는 함수를 지정해야한다.
+
+``` java
+Stream<R> map(Function<? super T, ? extends R> mapper)
+```
+
+예를 들어 `File`의 스트림에서 파일의 이름만 뽑아서 출력하고 싶을 때, 아래와 같이 `map()`을 이용하면 `File`객체에서 파일의 이름(String)만 간단히 뽑아낼 수 있다.
+
+``` java
+Stream<File> fileStream = Stream.of(new File("Ex1.java"), new File("Ex1"),
+        new File("Ex1.bak"), new File("Ex2.java"), new File("Ex1.txt"));
+
+// map()으로 Stream<File>을 Stream<String>으로 변환
+Stream<String> filenameStream = fileStream.map(File::getName);
+filenameStream.forEach(System.out::println);    // 스트림의 모든 파일이름을 출력
+```
+
+`map()` 역시 중간 연산이므로, 연산결과는 String을 요소로 하는 스트림이다. `map()`으로 `Stream<File>`을 `Stream<String>`으로 변환했다고 볼 수 있다.
+
+그리고, `map()`도 `filter()`처럼 하나의 스트림에 여러 번 적용할 수 있다. 다음의 문장은 `File`의 스트림에서 파일의 확장자만을 뽑은 다음 중복을 제거해서 출력한다.
+
+``` java
+fileStream.map(File::getName)   // Stream<File> → Stream<String>
+    .filter(s -> s.indexOf(',') != -1)  // 확장자가 없는 것은 제외
+    .map(s -> s.substring(s.indexOf(',') + 1))  // Stream<String> → Stream<String>
+    .map(String::toUpperCase)   // 모두 대문자로 변환
+    .distinct() // 중복 제거
+    .forEach(System.out::print);    // JAVABAKTXT
+```
+
+</br>
+
+### 조회 - peek()
+
+연산과 연산 사이에 올바르게 처리되었는지 확인하고 싶다면, `peek()`를 사용하자. `forEach()`와 달리 스트림의 요소를 소모하지 않으므로 연산 사이에 여러 번 끼워 넣어도 문제가 되지 않는다.
+
+``` java
+fileStream.map(File::getName)   // Stream<File> → Stream<String>
+    .filter(s -> s.indexOf(',') != -1)  // 확장자가 없는 것은 제외
+    .peek(s -> System.out.printf("filename = %s%n", s)) // 파일명을 출력한다.
+    .map(s -> s.substring(s.indexOf(',') + 1))  // 확장자만 추출
+    .peek(s -> System.out.printf("extension = %s%n", s))    // 확장자를 출력한다.
+    .forEach(System.out::println);
+```
+
+`filter()`나 `map()`의 결과를 확인할 때 유용하게 사용될 수 있다.
+
+</br>
+
+예제 14-9 / ch14 / StreamEx2.java
+
+``` java
+import java.io.*;
+import java.util.stream.Stream;
+
+public class StreamEx2 {
+	public static void main(String[] args) {
+		File[] fileArr = { new File("Ex1.java"), new File("Ex1.bak"),
+				new File("Ex2.java"), new File("Ex1"), new File("Ex1.txt")
+		};
+		
+		Stream<File> fileStream = Stream.of(fileArr);
+		
+		// map()으로 Stream<File>을 Stream<String>으로 변환
+		Stream<String> filenameStream = fileStream.map(File::getName);
+		filenameStream.forEach(System.out::println);	// 모든 파일의 이름을 출력
+		
+		fileStream = Stream.of(fileArr);	// 스트림을 다시 생성
+		
+		fileStream.map(File::getName)	// Stream<File> → Stream<String>
+			.filter(s -> s.indexOf('.') != -1) // 확장자가 없는 것은 제외
+			.peek(s -> System.out.printf("filename = %s%n", s))
+			.map(s -> s.substring(s.indexOf('.') + 1))	// 확장자만 추출
+			.peek(s -> System.out.printf("extension = %s%n", s))
+			.map(String::toUpperCase)	// 모두 대문자로 변환
+			.distinct()	// 중복 제거
+			.forEach(System.out::print);	// JAVABAKTXT
+		
+		System.out.println();
+	}
+}
+```
+
+```
+Ex1.java
+Ex1.bak
+Ex2.java
+Ex1
+Ex1.txt
+filename = Ex1.java
+extension = java
+JAVA
+filename = Ex1.bak
+extension = bak
+BAK
+filename = Ex2.java
+extension = java
+filename = Ex1.txt
+extension = txt
+TXT
+```
+
+</br>
+
+### mapToInt(), mapToLong(), mapToDouble()
+
+`map()`은 연산의 결과로 `Stream<T>`타입의 스트림을 반환하는데, 스트림의 요소를 숫자로 변환하는 경우 `IntStream`과 같은 기본형 스트림으로 변환하는 것이 더 유용할 수 있다. `Stream<T>`타입의 스트림을 기본형 스트림으로 변환할 때 사용하는 것이 아래의 메소드들이다.
+
+``` java
+DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper)
+IntStream mapToInt(ToIntFunction<? super T> mapper)
+LongStream mapToLong(ToLongFunction<? super T> mapper)
+```
+
+앞서 사용했던 `studentStream`에서, 스트림에 포함된 모든 학생의 성적을 합산해야 한다면, `map()`으로 학생의 총점을 뽑아서 새로운 스트림을 만들어 낼 수 있다.
+
+``` java
+Stream<Integer> studentScoreStream = studentStream.map(Student::getTotalScore);
+```
+
+그러나 이럴 때는 애초부터 `mapToInt()`를 사용해서 `Stream<Integer>`가 아닌 `IntStream`타입의 스트림을 생성해서 사용하는 것이 더 효율적이다. 성적을 더할 때, Integer를 int로 변환할 필요가 없기 때문이다.
+
+``` java
+IntStream studentScoreStream = studentStream.mapToInt(Student::getTotalScore);
+int allTotalScore = studentScoreStream.sum();   // int sum();
+```
+
+`count()`만 지원하는 `Stream<T>`와 달리 `IntStream`과 같은 기본형 스트림은 아래와 같이 숫자를 다루는데 편리한 메소드들을 제공한다.
+
+> max()와 min()은 Stream에도 정의되어 있지만, 매개변수로 Comparator를 지정해야 한다는 차이가 있다.
+
+![image](https://ifh.cc/g/d3kOgy.png)
+
+스트림의 요소가 하나도 없을 때, `sum()`은 0을 반환하면 그만이지만 다른 메소드들은 단순히 0을 반환할 수 없다. 여러 요소들을 합한 평균이 0일수 도 있기 때문이다. 이를 구분하기 위해 단순히 double값을 반환하는 대신, double타입의 값을 내부적으로 가지고 있는 `OptionalDouble`을 반환하는 것이다. `OptionalDouble` 등은 일종의 래퍼클래스로 각각 int값과 Double값을 내부적으로 가지고 있다.
+
+그리고 이 메소드들은 최종연산이기 때문에 호출 후에 스트림이 닫힌다. 아래의 코드에서처럼 하나의 스트림에 `sum()`과 `average()`를 연속해서 호출할 수 없다.
+
+``` java
+IntStream scoreStream = studentStream.mapToInt(Student::getTotalScore);
+
+long totalScore = scoreStream.sum();    // sum()은 최종연산이라 호출 후 스트림이 닫힘
+OptionalDouble average = scoreStream.average(); // 에러. 스트림이 이미 닫혔음.
+
+double d = average.getAsDouble();   // OptionalDouble에 저장된 값을 꺼내서 d에 저장
+```
+
+`sum()`과 `average()`를 모두 호출해야할 때, 스트림을 또 생성해야하므로 불편하다. 그래서 `summaryStatistics()`라는 메소드가 따로 제공된다.
+
+``` java
+IntSummaryStatistics stat = scoreStream.summaryStatistics();
+
+long totalCount = stat.getCount();
+long totalScore = stat.getSum();
+double avgScore = stat.getAverage();
+int minScore = stat.getMin();
+int maxScore = stat.getMax();
+```
+
+`IntSummaryStatistics`는 위와 같이 다양한 종류의 메소드를 제공하며, 이 중에서 필요한 것만 골라서 사용하면 된다.
+
+기본형 스트림 `LongStream`과 `DoubleStream`도 `IntStream`과 같은 연산(반환타입은 다름)을 지원한다. 반대로 `IntStream`을 `Stream<T>`로 변환할 때는 `mapToObj()`를, `Stream<Integer>`로 반환할 때는 `boxed()`를 사용한다.
+
+``` java
+Stream<T> mapToObj(IntFunction<? extends U> mapper)
+Stream<Integer> boxed()
+```
+
+아래는 로또번호를 생성해서 출력하는 코드인데, `mapToObj()`를 이용해서 `IntStream`을 `Stream<String>`으로 변환하였다.
+
+``` java
+IntStream intStream = new Random().ints(1, 46); // 1~45사이의 정수(46은 포함안됨)
+Stream<String> lottoStream = intStream.distinct().limit(6).sorted()
+                                .mapToObj(i -> i + ",");    // 정수를 문자열로 반환
+lottoStream.forEach(System.out::print); // 12, 14, 20, 23, 26, 29
+```
+
+참고로 `CharSequence`에 정의된 `chars()`는 String이나 StringBuffer에 저장된 문자들을 `IntStream`으로 다룰 수 있게 해준다.
+
+``` java
+IntStream charStream = "12345".chars(); // default IntStream chars()
+int charSum = charStream.map(ch -> ch - '0').sum(); // charSum = 15
+```
+
+위의 코드에서 사용된 `map()`은 `IntStream`에 정의된 것으로 `IntStream`을 결과로 반환한다. 그리고 `mapToInt()`와 함께 자주 사용되는 메소드로는 Integer의 `parseInt()`나 `valueOf()`가 있다.
+
+``` java
+Stream<String> → IntStream 변환할 때, mapToInt(Integer::parseInt)
+Stream<Integer> → IntStream 변활할 때, mapToInt(Integer::intValue)
+```
+
+</br>
+
+예제 14-10 / ch14 / StreamEx3.java
+
+``` java
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamEx3 {
+	public static void main(String[] args) {
+		Student[] stuArr = {
+			new Student("이자바", 3, 300),
+			new Student("김자바", 1, 200),
+			new Student("안자바", 2, 100),
+			new Student("박자바", 2, 150),
+			new Student("소자바", 1, 200),
+			new Student("나자바", 3, 290),
+			new Student("감자바", 3, 180)
+		};
+		
+		Stream<Student> stuStream = Stream.of(stuArr);
+		
+		stuStream.sorted(Comparator.comparing(Student::getBan)
+						.thenComparing(Comparator.naturalOrder()))
+						.forEach(System.out::println);
+		
+		stuStream = Stream.of(stuArr);	// 스트림을 다시 생성한다.
+		IntStream stuScoreStream = stuStream.mapToInt(Student::getTotalScore);
+		
+		IntSummaryStatistics stat = stuScoreStream.summaryStatistics();
+		System.out.println("count = " + stat.getCount());
+		System.out.println("sum = " + stat.getSum());
+		System.out.printf("average = %.2f%n", stat.getAverage());
+		System.out.println("min = " + stat.getMin());
+		System.out.println("max = " + stat.getMax());
+	}
+}
+
+class Student implements Comparable<Student> {
+	String name;
+	int ban;
+	int totalScore;
+	Student(String name, int ban, int totalScore) {
+		this.name = name;
+		this.ban = ban;
+		this.totalScore = totalScore;
+	}
+	
+	public String toString() {
+		return String.format("[%s, %d, %d]", name, ban, totalScore);
+	}
+	
+	String getName() { return name; }
+	int getBan() { return ban; }
+	int getTotalScore() { return totalScore; }
+	
+	// 총점 내림차순을 기본 정렬로 한다.
+	public int compareTo(Student s) {
+		return s.totalScore - this.totalScore;
+	}
+}
+```
+
+```
+[김자바, 1, 200]
+[소자바, 1, 200]
+[박자바, 2, 150]
+[안자바, 2, 100]
+[이자바, 3, 300]
+[나자바, 3, 290]
+[감자바, 3, 180]
+count = 7
+sum = 1420
+average = 202.86
+min = 100
+max = 300
+```
+
+</br>
+
+### flatMap() - Stream<T[]>를 Stream<T>로 변환
+
+스트림의 요소가 배열이거나 `map()`의 연산결과가 배열인 경우, 즉 스트림의 타입이 `Stream<T[]>`인 경우 `map()`대신 `flatMap()`을 사용하면 된다.
+
+예를 들어 아래와 같이 요소가 문자열 배열(String[])인 스트림이 있을 때,
+
+``` java
+Stream<String[]> stuArrStrm = Stream.of(
+        new String[] {"abc", "def", "ghi"},
+        new String[] {"ABC", "GHI", "JKLMN"}
+);
+```
+
+각 요소의 문자열들을 합쳐서 문자열이 요소인 스트림, 즉 `Stream<String>`으로 만들려면 먼저 스트림의 요소를 변환해야하니까 일단 `map()`을 써야할 것이고 여기에 배열을 스트림으로 만들어주는 `Arrays.stream<T[]>`를 함께 사용해야 한다.
+
+``` java
+Stream<Stream<String>> strStrStrm = strArrStrm.map(Arrays::stream);
+```
+
+예상한 것과 달리, `Stream<String[]>`을 `map(Arrays::stream)`으로 변환한 결과는 `Stream<Stirng>`이 아닌, `Stream<Stream<String>>`이다. 즉, 스트림의 스트림인 것이다.
+
+각 요소의 문자열들이 합쳐지지 않고, 스트림의 스트림 형태로 되었다. 이 때, 간단히 `map()`을 아래와 같이 `flatMap()`으로 바꾸기만 하면 된다.
+
+``` java
+Stream<Stream<String>> strStrStrm = strArrStrm.map(Arrays::stream);
+
+    Stream<String> strStrm = strArrStrm.flatMap(Arrays::stream);
+```
+
+`flatMap()`은 `map()`과 달리 스트림의 스트림이 아닌 스트림으로 만들어 준다.
+
+아래와 같이 여러 문장을 요소로 하는 스트림이 있을 때, 이 문장들을 `split()`으로 나눠서 요소가 단어인 스트림을 만들고 싶다면
+
+``` java
+String[] lineArr = {
+    "Belive or not It is ture",
+    "Do or do not There is no try",
+};
+
+Stream<String> lineStream = Arrays.stream(lineArr);
+Stream<Stream<String>> strArrStream = lineStream.map(line -> Stream.of(line.split(" +")));
+```
+
+`map()`은 `Stream<String>`이 아니라 `Stream<Stream<String>>`을 결과로 돌려준다. 이럴 때도 `map()`대신 `flatMap()`으로 원하는 결과를 얻을 수 있다.
+
+``` java
+Stream<String> strStream = lineStream.flatMap(line -> Stream.of(line.split(" +")));
+```
+
+`strStream`의 단어들을 모두 소문자로 변환하고, 중복된 단어들을 제거한 다음에 정렬해서 출력하는 문장은 다음과 같다.
+
+``` java
+strStream.map(String::toLowerCase)  // 모든 단어를 소문자로 변경
+         .distinct()    // 중복된 단어를 제거
+         .sorted()  // 사전 순으로 정렬
+         .forEach(System.out::println); // 화면에 출력
+```
+
+스트림을 요소로 하는 스트림, 즉 스트림의 스트림을 하나의 스트림으로 합칠 때도 `flatMap()`을 사용한다.
+
+``` java
+Stream<String> strStrm = Stream.of("abc", "def", "jklmn");
+Stream<String> strStrm2 = Stream.of("ABC", "GHI", "JKLMN");
+
+Stream<Stream<String>> strmStrm = Stream.of(strStrm, strStrm2)
+```
+
+위와 같이 요소의 타입이 `Stream<String>`인 스트림(`Stream<Stream<String>>`)이 있을 때, 이 스트림을 `Stream<String>`으로 변환하려면 다음과 같이 `map()`과 `flatMap()`을 함께 사용해야 한다.
+
+``` java
+Stream<String> strStream = strmStrm
+    .map(s -> s.toArray(String[]::new)) // Stream<Stream<String>> → Stream<String[]>
+    .flatMap(Arrays::stream);   // Stream<String[]> → Stream<String>
+```
+
+`toArray()`는 스트림을 배열로 변환해서 반환한다. 매개변수를 지정하지 않으면 `Object[]`을 반환하므로 위와 같이 특정 타입의 생성자를 지정해줘야 한다. 여기서는 String배열의 생성자(`String[]::new`)를 지정하였다. 그 다음엔 `flatMap()`으로 `Stream<String[]>`을 `Stream<String>`으로 변환한다.
+
+</br>
+
+예제 14-11 / ch14 / StreamEx4.java
+
+``` java
+import java.util.*;
+import java.util.stream.Stream;
+
+public class StreamEx4 {
+	public static void main(String[] args) {
+		Stream<String[]> strArrStrm = Stream.of(
+			new String[] { "abc", "def", "jkl" },
+			new String[] { "ABC", "GHI", "JKL" }
+		);
+		
+//		Stream<Stream<String>> strStrmStrm = strArrStrm.map(Arrays::stream);
+		Stream<String> strStrm = strArrStrm.flatMap(Arrays::stream);
+		
+		strStrm.map(String::toLowerCase)
+			   .distinct()
+			   .sorted()
+			   .forEach(System.out::println);
+		System.out.println();
+		
+		String[] lineArr = {
+			"Believe or not It is true",
+			"Do or do not There is no try",
+		};
+		
+		Stream<String> lineStream = Arrays.stream(lineArr);
+		lineStream.flatMap(line -> Stream.of(line.split(" +")))	// " +" 하나 이상의 공백(정규식)
+			.map(String::toLowerCase)
+			.distinct()
+			.sorted()
+			.forEach(System.out::println);
+		System.out.println();
+		
+		Stream<String> strStrm1 = Stream.of("AAA", "ABC", "bBb", "Dd");
+		Stream<String> strStrm2 = Stream.of("bbb", "aaa", "ccc", "dd");
+		
+		Stream<Stream<String>> strStrmStrm = Stream.of(strStrm1, strStrm2);
+		Stream<String> strStream = strStrmStrm
+									.map(s -> s.toArray(String[]::new))
+									.flatMap(Arrays::stream);
+		strStream.map(String::toLowerCase)
+				 .distinct()
+				 .forEach(System.out::println);
+	}
+}
+```
+
+```
+abc
+def
+ghi
+jkl
+
+believe
+do
+is
+it
+no
+not
+or
+there
+true
+try
+
+aaa
+abc
+bbb
+dd
+ccc
+```
