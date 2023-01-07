@@ -1291,3 +1291,202 @@ opt.equals(opt2) ? true
 result3 = 123
 result4 = 0
 ```
+
+</br>
+
+## 2.5 스트림의 최종 연산
+
+최종 연산은 스트림의 요소를 소모해서 결과를 만들어낸다. 그래서 최종 연산후에는 스트림이 닫히게 되고 더 이상 사용할 수 없다. 최종 연산의 결과는 스트림 요소의 합과 같은 단일 값이거나, 스트림의 요소가 담긴 배열 또는 컬렉션일 수 있다.
+
+</br>
+
+### forEach
+
+`forEach()`는 `peek()`과 달리 스트림의 요소를 소모하는 최종연산이다. 반환 타입이 void이므로 스트림의 요소를 출력하는 용도로 많이 사용된다.
+
+``` java
+void forEach(Consumer<? super T> action)
+```
+
+</br>
+
+### 조건 검사 - allMatch(), anyMatch(), noneMatch(), findFirst(), findAny()
+
+스트림에 요소에 대해 지정된 조건에 모든 요소가 일치하는 지, 일부가 일치하는지 아니면 어떤 요소도 일치하지 않는지 확인하는데 사용할 수 있는 메소드들이다. 이 메소드들은 모두 매개변수로 `Predicate`를 요구하며, 연산결과로 boolean을 반환한다.
+
+``` java
+boolean allMatch (Predicate<? super T> predicate)
+boolean anyMatch (Predicate<? super T> predicate)
+boolean noneMatch (Predicate<? super T> predicate)
+```
+
+예를 들어 학생들의 성적 정보 스트림 `stuStream`에서 총점이 낙제점(총점 100이하)인 학생이 있는지 확인하는 방법은 다음과 같다.
+
+``` java
+boolean noFailed = stuStream.anyMatch(s -> s.getTotalScore() <= 100)
+```
+
+이외에도 스트림의 요소 중에서 조건에 일치하는 첫 번째 것을 반환하는 `findFirst()`가 있는데, 주로 `filter()`와 함께 사용되어 조건에 맞는 스트림의 요소가 있는지 확인하는데 사용된다. 병렬 스트림인 경우에는 `findFirst()`대신 `findAny()`를 사용해야 한다.
+
+``` java
+Optional<Student> stu = stuStream.filter(s -> s.getTotalScore() <= 100).findFirst();
+Optional<Student> stu = parallelStream.filter(s -> s.getTotalScore() <= 100).findAny();
+```
+
+`findAny()`와 `findFirst()`의 반환 타입은 `Optional<T>`이며, 스트림의 요소가 없을 때는 비어있는 `Optional`객체를 반환한다.
+
+> 비어있는 Operator객체는 내부적으로 null을 저장하고 있다.
+
+</br>
+
+### 통계 - count(), sum(), average(), max(), min()
+
+`IntStream`과 같은 기본형 스트림에는 스트림의 요소들에 대한 통계 정보를 얻을 수 있는 메소드들이 있다. 그러나 기본형 스트림이 아닌 경우에는 통계와 관련된 메소드들이 아래의 3개뿐이다.
+
+> 기본형 스트림의 min(), max()와 달리 매개변수로 Comparator를 필요로 한다는 차이가 있다.
+
+``` java
+long count()
+Optional<T> max(Comparator<? super T> comparator)
+Optional<T> min(Comparator<? super T> comparator)
+```
+
+대부분의 경우 위의 메소드를 사용하기보다 기본형 스트림으로 변환하거나, 아니면 `reduce()`와 `collect()`를 사용해서 통계 정보를 얻는다.
+
+</br>
+
+### 리듀싱 - reduce()
+
+`reduce()`는 스르림의 요소를 줄여나가면서 연산을 수행하고 최종결과를 반환한다. 그래서 매개변수의 타입이 `BinaryOperator<T>`인 것이다. 처음 두 요소를 가지고 연산한 결과를 가지고 그 다음 요소와 연산한다.
+
+이 과정에서 스트림의 요소를 하나씩 소모하게 되며, 스트림의 모든 요소를 소모하게 되면 그 결과를 반환한다.
+
+``` java
+Optional<T> reduce(BinaryOperator<T> accumulator)
+```
+
+이 외에도 연산결과의 초기값(identity)을 갖는 `reduce()`도 있는데, 이 메소드들은 초기값과 스트림의 첫 번째 요소로 연산을 시작한다. 스트림의 요소가 하나도 없는 경우, 초기값이 반환되므로, 반환 타입이 `Optional<T>`가 아니라 `T`이다.
+
+> BinaryOperator<T>는 BiFunction의 자손이며, BiFunction<T, T, T>와 동등하다.
+
+``` java
+T reduce(T identity, BinaryOperator<T> accumulator)
+U reduce(U identity, BiFunction<U, T, U> accumulator, BinaryOperator<U> combiner)
+```
+
+위의 두 번째 메소드의 마지막 매개변수인 `combiner`는 병렬 스트림에 의해 처리된 결과를 합칠 때 사용하기 위해 사용한다.
+
+최종 연산 `count()`와 `sum()` 등은 내부적으로 모두 `reduce()`를 이용해서 아래와 같이 작성된 것이다.
+
+``` java
+int count = intStream.reduce(0, (a, b) -> a + 1);	// count()
+int sum = intStream.reduce(0, (a, b) -> a + b);	// sum()
+int max = intStream.reduce(Integer.MIN_VALUE, (a, b) -> a > b ? a : b);	//max()
+int min = intStream.reduce(Integer.MAX_VALUE, (a, b) -> a < b ? a : b);	// min()
+```
+
+사실 `max()`와 `min()`의 경우, 초기값이 필요없으므로 `Optional<T>`를 반환하는 매개변수 하나짜리 `reduce()`를 사용하는 것이 낫다. 단, `intStream`의 타입이 `IntStream`인 경우 `OptionalInt`를 사용해야 한다. `Stream<T>`와 달리 `IntStream`에 정의된 `reduce()`의 반환 타입이 `OptionalInt`이기 때문이다.
+
+``` java
+// OptionalInt reduce(IntBinaryOperator accumulator)
+OptionalInt max = intStream.reduce((a, b) -> a > b ? a : b);	// max()
+OptionalInt min = intStream.reduce((a, b) -> a < b ? a : b);	// min()
+```
+
+참고로 위의 문장들에서 람다식을 `Integer`클래스의 static메소드 `max()`와 `min()`을 이용해서 메소드 참조로 바꾸면 다음과 같다.
+
+``` java
+OptionalInt max = intStream.reduce(Integer::max);	// int max(int a, int b)
+OptionalInt min = intStream.reduce(Integer::min);	// int min(int a, int b)
+```
+
+그리고 `OptionalInt`에 저장된 값을 꺼내려면 아래와 같이 하면 된다.
+
+``` java
+int maxValue = max.getAsInt();	// OptionalInt에 저장된 값을 maxValue에 저장
+```
+
+`reduce()`로 스트림의 모든 요소를 다 더하는 과정을 for문으로 표현해 보았다.
+
+``` java
+int a = identity;	// 초기값을 a에 저장한다.
+
+for(int b : stream)
+	a = a + b;	// 모든 요소의 값을 a에 누적한다.
+```
+
+`reduce()`가 다음과 같이 작성되어 있다.
+
+``` java
+T reduce(T identity, BinaryOperator<T> accumulator) {
+	T a = identity;
+
+	for(T b : stream)
+		a = accumulator.apply(a, b);
+
+	return a;
+}
+```
+
+`reduce()`를 사용하는 방법은 간단하다. 그저 초기값(identity)과 어떤 연산(BinaryOperator)으로 스트림의 요소를 줄여나갈 것인지만 결정하면 된다.
+
+</br>
+
+예제 14-13 / ch14 / StreamEx5.java
+
+``` java
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamEx5 {
+	public static void main(String[] args) {
+		String[] strArr = {
+			"Inheritance", "Java", "Lambda", "stream",
+			"OptionalDouble", "IntStream", "count", "sum"
+		};
+		
+		Stream.of(strArr).forEach(System.out::println);
+		
+		boolean noEmptyStr = Stream.of(strArr).noneMatch(s -> s.length() == 0);
+		Optional<String> sWord = Stream.of(strArr)
+								.filter(s -> s.charAt(0) == 's').findFirst();
+		
+		System.out.println("noEmptyStr = " + noEmptyStr);
+		System.out.println("sWord = " + sWord.get());
+		
+		// Stream<String[]>을 IntStream으로 변환
+		IntStream intStream1 = Stream.of(strArr).mapToInt(String::length);
+		IntStream intStream2 = Stream.of(strArr).mapToInt(String::length);
+		IntStream intStream3 = Stream.of(strArr).mapToInt(String::length);
+		IntStream intStream4 = Stream.of(strArr).mapToInt(String::length);
+		
+		int count = intStream1.reduce(0, (a, b) -> a + 1); 
+		int sum = intStream2.reduce(0, (a, b) -> a + b);
+		
+		OptionalInt max = intStream3.reduce(Integer::max);
+		OptionalInt min = intStream4.reduce(Integer::min);
+		
+		System.out.println("count = " + count);
+		System.out.println("sum = " + sum);
+		System.out.println("max = " + max.getAsInt());
+		System.out.println("min = " + min.getAsInt());
+	}
+}
+```
+
+```
+Inheritance
+Java
+Lambda
+stream
+OptionalDouble
+IntStream
+count
+sum
+noEmptyStr = true
+sWord = stream
+count = 8
+sum = 58
+max = 14
+min = 3
+```
