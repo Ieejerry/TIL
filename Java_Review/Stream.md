@@ -2324,3 +2324,144 @@ public class StreamEx8 {
 [1-3][HIGH, MID]
 [2-3][HIGH, MID]
 ```
+
+</br>
+
+## 2.7 Collector 구현하기
+
+컬렉터를 작성한다는 것은 `Collector`인터페이스를 구현한다는 것을 의미하는데, `Collector`인터페이스는 다음가 같이 정의되어 있다.
+
+``` java
+public interface Collector<T, A, R> {
+	Supplier<A> supplier();
+	BiConsumer<A, T> accumulator();
+	BinaryOperator<A> combiner();
+	Function<A, R> finisher();
+
+	Set<Characteristics> characteristics();	// 컬렉터의 특성이 담긴 Set을 반환
+		...
+}
+```
+
+직접 구현해야하는 것은 위의 5개의 메소드인데, `characteristics()`를 제외하면 모두 반환 타입이 함수형 인터페이스이다. 즉, 4개의 람다식을 작성하면 되는 것이다.
+
+> **supplier()** 작업 결과를 저장할 공간을 제공   
+**accumulator()** 스트림의 요소를 수집(collect)할 방법을 제공   
+**combine()** 두 저장공간을 병합할 방법을 제공(병렬 스트림)   
+**finisher()** 결과를 최종적으로 변환할 방법을 제공
+
+`supplier()`는 수집 결과를 저장할 공간을 제공하기 위한 것이고, `accumulator()`는 스트림의 요소를 어떻게 `supplier()`가 제공한 공간에 누적할 것인지를 정의한다. `combiner()`는 병렬 스트림인 경우, 여러 쓰레드에 의해 처리된 결과를 어떻게 합칠 것인가를 정의한다. 그리고, `finisher()`는 작업결과를 변환하는 일을 하는데 변환이 필요없다면, 항등 함수인 `Function.identity()`를 반환하면 된다.
+
+``` java
+public Function finisher() {
+	return Function.identity();	// 항등 함수를 반환. return x -> x;와 동일
+}
+```
+
+마지막으로 `characteristics()`는 컬렉터가 수행하는 작업이 속성에 대한 정보를 제공하기 위한 것이다.
+
+> **characteristics.CONCURRENT** 병렬로 처리할 수 있는 작업   
+**Characteristics.UNORDERED** 스트림의 요소의 순서가 유지될 필요가 없는 작업   
+**Characteristics.IDENTITY_FINISH** finisher()가 항등 함수인 작업
+
+위의 3가지 속성 중에서 해당하는 것을 다음과 같이 `Set`에 담아서 반환하도록 구현하면 된다.
+
+> 열거형 Characteristics는 Collector내에 정의되어 있다.
+
+``` java
+public Set<Characteristics> characteristics() {
+	return Collections.unmodifiableSet(EnumSet.of(
+					Collector.Characteristics.CONCURRENT,
+					Collector.CHaracteristics.UNORDERED
+			));
+}
+```
+
+만일 아무런 속성도 지정하고 싶지 않으면, 아래와 같이 하면 된다.
+
+``` java
+Set<Characteristics> characteristics() {
+	return Collectors.emptySet();	// 지정할 특성이 없는 경우 비어있는 Set을 반환
+}
+```
+
+`finisher()`를 제외하고 `supplier()`, `accumulator()`, `combiner()`는 모두 리듀싱에 등장했던 개념들이다. 결국 `Collector`도 내부적으로 처리하는 과정이 리듀싱과 같다는 것을 의미한다. `IntStream`의 `count()`, `sum()`, `max()`, `min()`등이 `reduce()`로 구현되어 있다. 그리고 `collect()`로도 `count()`등의 메소드와 같은 일을 할 수 있다.
+
+``` java
+long count = stuStream.count();
+long count = stuStream.collect(counting());
+```
+
+`reduce()`와 `collect()`은 근본적으로 하는 일이 같다. `collect()`는 그룹화와 분할, 집계 등에 유용하게 쓰이고, 병렬화에 있어서 `reduce()`보다 `collect()`가 더 유리하다.
+
+만일 String배열의 모든 문자열을 하나의 문자열로 합치려면 다음과 같을 것이다.
+
+``` java
+String[] strArr = { "aaa", "bbb", "ccc" };
+StringBuffer sb = new StringBuffer();	// supplier(), 저장할 공간을 생성
+
+for(String tmp : strArr)
+	sb.append(tmp);	// accumulator(), sb에 요소를 저장
+
+String result = sb.toString();	// finisher(), StringBuffer를 String으로 변환
+```
+
+위의 코드를 바탕으로 `Stream<String>`의 모든 문자열을 하나로 결합해서 String으로 반환하는 `ConcatCollector`를 작성해보겠다.
+
+</br>
+
+예제 14-17 / ch14 / CollectorEx1.java
+
+``` java
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
+public class CollectorEx1 {
+	public static void main(String[] args) {
+		String[] strArr = { "aaa", "bbb", "ccc" };
+		Stream<String> strStream = Stream.of(strArr);
+		
+		String result = strStream.collect(new ConcatCollector());
+		
+		System.out.println(Arrays.toString(strArr));
+		System.out.println("result = " + result);
+	}
+}
+
+class ConcatCollector implements Collector<String, StringBuilder, String> {
+	@Override
+	public Supplier<StringBuilder> supplier() {
+		return () -> new StringBuilder();
+//		return StringBuilder::new;
+	}
+	
+	@Override
+	public BiConsumer<StringBuilder, String> accumulator() {
+		return (sb, s) -> sb.append(s);
+//		return StringBuilder::append;
+	}
+	
+	@Override
+	public Function<StringBuilder, String> finisher() {
+		return sb -> sb.toString();
+//		return StringBuilder::toString;
+	}
+	
+	@Override
+	public BinaryOperator<StringBuilder> combiner() {
+		return (sb, sb2) -> sb.append(sb2);
+//		return StringBuilder::append;
+	}
+	
+	@Override
+	public Set<Characteristics> characteristics() {
+		return Collections.emptySet();
+	}
+}
+```
+
+```
+[aaa, bbb, ccc]
+result = aaabbbccc
+```
