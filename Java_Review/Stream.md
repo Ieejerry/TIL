@@ -2465,3 +2465,11 @@ class ConcatCollector implements Collector<String, StringBuilder, String> {
 [aaa, bbb, ccc]
 result = aaabbbccc
 ```
+
+</br>
+
+## 2.8 스트림의 변환
+
+스트림간의 변환을 표로 간단히 정리해 보았다.
+
+![image](https://ifh.cc/g/MWHdFa.png)
