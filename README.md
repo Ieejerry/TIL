@@ -104,3 +104,4 @@
 - [람다식](https://github.com/leehenson/TIL/blob/master/Java_Review/Lambda_expression.md)
 - [스트림](https://github.com/leehenson/TIL/blob/master/Java_Review/Stream.md)
 - [자바에서의 입출력](https://github.com/leehenson/TIL/blob/master/Java_Review/Ouput_in_Java.md)
+- [바이트기반 스트림](https://github.com/leehenson/TIL/blob/master/Java_Review/Byte_based_stream.md)
