@@ -109,3 +109,4 @@
 - [문자기반 스트림](https://github.com/leehenson/TIL/blob/master/Java_Review/Character_based_stream.md)
 - [문자기반의 보조스트림](https://github.com/leehenson/TIL/blob/master/Java_Review/Character_based_secondary_stream.md)
 - [표준입출력과 File](https://github.com/leehenson/TIL/blob/master/Java_Review/Standard_Input_Output_and_File.md)
+- [직렬화](https://github.com/leehenson/TIL/blob/master/Java_Review/Serialization.md)
