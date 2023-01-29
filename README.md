@@ -118,3 +118,4 @@
 - [데이터 스트럭쳐란](https://github.com/leehenson/TIL/blob/master/Data_Structure/What_is_the_DataStructure.md)
 - [배열](https://github.com/leehenson/TIL/blob/master/Data_Structure/Array.md)
 - [Array Java API](https://github.com/leehenson/TIL/blob/master/Data_Structure/Array_Java_API.md)
+- [리스트](https://github.com/leehenson/TIL/blob/master/Data_Structure/List.md)
