@@ -126,3 +126,7 @@
 - [LinkedList Java 구현](https://github.com/leehenson/TIL/blob/master/Data_Structure/LinkedList_implementation.md)
 - [DoublyLinkedList](https://github.com/leehenson/TIL/blob/master/Data_Structure/DoublyLinkedList.md)
 - [DoublyLinkedList Java 구현](https://github.com/leehenson/TIL/blob/master/Data_Structure/DoublyLinkedList_implementation.md)
+
+## MySQL
+
+- [데이터베이스의 목적](https://github.com/leehenson/TIL/blob/master/MySQL/Purpose_of_the_database.md)
