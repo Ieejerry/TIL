@@ -130,3 +130,4 @@
 ## MySQL
 
 - [데이터베이스의 목적](https://github.com/leehenson/TIL/blob/master/MySQL/Purpose_of_the_database.md)
+- [MySQL의 구조](https://github.com/leehenson/TIL/blob/master/MySQL/Structure_of_mysql.md)
