@@ -132,3 +132,4 @@
 - [데이터베이스의 목적](https://github.com/leehenson/TIL/blob/master/MySQL/Purpose_of_the_database.md)
 - [MySQL의 구조](https://github.com/leehenson/TIL/blob/master/MySQL/Structure_of_mysql.md)
 - [MySQL 서버 접속](https://github.com/leehenson/TIL/blob/master/MySQL/Connecting_to_MySQL_%20Server.md)
+- [스키마의 사용](https://github.com/leehenson/TIL/blob/master/MySQL/Using_Schema.md)
