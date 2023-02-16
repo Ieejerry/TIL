@@ -135,3 +135,4 @@
 - [스키마의 사용](https://github.com/leehenson/TIL/blob/master/MySQL/Using_Schema.md)
 - [SQL과 테이블의 구조](https://github.com/leehenson/TIL/blob/master/MySQL/SQL_and_table_structure.md)
 - [테이블의 생성](https://github.com/leehenson/TIL/blob/master/MySQL/Creating_a_Table.md)
+- [CRUD](https://github.com/leehenson/TIL/blob/master/MySQL/CRUD.md)
