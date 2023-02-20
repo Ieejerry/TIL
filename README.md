@@ -139,3 +139,4 @@
 - [INSERT](https://github.com/leehenson/TIL/blob/master/MySQL/INSERT.md)
 - [SELECT](https://github.com/leehenson/TIL/blob/master/MySQL/SELECT.md)
 - [UPDATE](https://github.com/leehenson/TIL/blob/master/MySQL/UPDATE.md)
+- [DELETE](https://github.com/leehenson/TIL/blob/master/MySQL/DELETE.md)
