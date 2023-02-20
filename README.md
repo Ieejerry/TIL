@@ -138,3 +138,4 @@
 - [CRUD](https://github.com/leehenson/TIL/blob/master/MySQL/CRUD.md)
 - [INSERT](https://github.com/leehenson/TIL/blob/master/MySQL/INSERT.md)
 - [SELECT](https://github.com/leehenson/TIL/blob/master/MySQL/SELECT.md)
+- [UPDATE](https://github.com/leehenson/TIL/blob/master/MySQL/UPDATE.md)
