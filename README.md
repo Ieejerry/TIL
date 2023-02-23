@@ -140,3 +140,4 @@
 - [SELECT](https://github.com/leehenson/TIL/blob/master/MySQL/SELECT.md)
 - [UPDATE](https://github.com/leehenson/TIL/blob/master/MySQL/UPDATE.md)
 - [DELETE](https://github.com/leehenson/TIL/blob/master/MySQL/DELETE.md)
+- [관계형 데이터베이스의 필요성](https://github.com/leehenson/TIL/blob/master/MySQL/The_need_for_relational_database.md)
