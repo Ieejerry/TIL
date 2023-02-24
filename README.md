@@ -143,3 +143,4 @@
 - [관계형 데이터베이스의 필요성](https://github.com/leehenson/TIL/blob/master/MySQL/The_need_for_relational_database.md)
 - [테이블 분리하기](https://github.com/leehenson/TIL/blob/master/MySQL/Separating_a_Table.md)
 - [JOIN](https://github.com/leehenson/TIL/blob/master/MySQL/JOIN.md)
+- [인터넷과 데이터베이스](https://github.com/leehenson/TIL/blob/master/MySQL/Internet_and_database.md)
