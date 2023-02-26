@@ -144,3 +144,4 @@
 - [테이블 분리하기](https://github.com/leehenson/TIL/blob/master/MySQL/Separating_a_Table.md)
 - [JOIN](https://github.com/leehenson/TIL/blob/master/MySQL/JOIN.md)
 - [인터넷과 데이터베이스](https://github.com/leehenson/TIL/blob/master/MySQL/Internet_and_database.md)
+- [MySQL Client](https://github.com/leehenson/TIL/blob/master/MySQL/MySQL_Client.md)
