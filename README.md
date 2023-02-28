@@ -146,3 +146,7 @@
 - [인터넷과 데이터베이스](https://github.com/leehenson/TIL/blob/master/MySQL/Internet_and_database.md)
 - [MySQL Client](https://github.com/leehenson/TIL/blob/master/MySQL/MySQL_Client.md)
 - [MySQL Workbench](https://github.com/leehenson/TIL/blob/master/MySQL/MySQL_Workbench.md)
+
+## Algorithm Picture book
+
+- [리스트(List)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/List.md)
