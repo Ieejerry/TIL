@@ -150,3 +150,4 @@
 ## Algorithm Picture book
 
 - [리스트(List)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/List.md)
+- [배열(Array)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Array.md)
