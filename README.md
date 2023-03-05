@@ -154,3 +154,4 @@
 - [스택(Stack)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Stack.md)
 - [큐(Queue)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Queue.md)
 - [해시 테이블(Hash table)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hash_table.md)
+- [힙(Heap)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Heap.md)
