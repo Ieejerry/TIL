@@ -156,3 +156,4 @@
 - [해시 테이블(Hash table)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hash_table.md)
 - [힙(Heap)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Heap.md)
 - [이진 탐색 트리(Binary search tree)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Binary_search_tree.md)
+- [버블 정렬(Bubble sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Bubble_sort.md)
