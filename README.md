@@ -159,3 +159,4 @@
 - [버블 정렬(Bubble sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Bubble_sort.md)
 - [선택 정렬(Selection sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Selection_sort.md)
 - [삽입 정렬(Insertion sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Insertion_sort.md)
+- [힙 정렬(Heap sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Heap_sort.md)
