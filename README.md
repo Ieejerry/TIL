@@ -161,3 +161,4 @@
 - [삽입 정렬(Insertion sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Insertion_sort.md)
 - [힙 정렬(Heap sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Heap_sort.md)
 - [병합 정렬(Merge sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Merge_sort.md)
+- [퀵 정렬(Quick sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Quick_sort.md)
