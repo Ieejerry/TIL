@@ -163,3 +163,4 @@
 - [병합 정렬(Merge sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Merge_sort.md)
 - [퀵 정렬(Quick sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Quick_sort.md)
 - [K-means법(K-means clustering)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/K-means_clustering.md)
+- [선형 탐색(Linear search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Linear_search.md)
