@@ -164,3 +164,4 @@
 - [퀵 정렬(Quick sort)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Quick_sort.md)
 - [K-means법(K-means clustering)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/K-means_clustering.md)
 - [선형 탐색(Linear search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Linear_search.md)
+- [이분 탐색(Binary search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Binary_search.md)
