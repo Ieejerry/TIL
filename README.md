@@ -166,3 +166,4 @@
 - [선형 탐색(Linear search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Linear_search.md)
 - [이분 탐색(Binary search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Binary_search.md)
 - [너비 우선 탐색(Breath first search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Breadth_first_search.md)
+- [깊이 우선 탐색(Depth first search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Depth_first_search.md)
