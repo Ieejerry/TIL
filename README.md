@@ -168,3 +168,4 @@
 - [너비 우선 탐색(Breath first search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Breadth_first_search.md)
 - [깊이 우선 탐색(Depth first search)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Depth_first_search.md)
 - [벨만 포드법(Bellman-Ford Algorithm)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Bellman_ford_algorithm.md)
+- [다익스트라 기법(Dijkstra algorithm)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Dijkstra_algorithm.md)
