@@ -172,3 +172,4 @@
 - [A*(에이 스타)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/A*.md)
 - [유클리드 호제법(Euclidean algorithm)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Euclidean_algorithm.md)
 - [소수 판별법(Primality test)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Primality_test.md)
+- [연속길이 부호(Run length encrypt)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Run_length_encrypt.md)
