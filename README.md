@@ -177,3 +177,4 @@
 - [보안의 기본(The basics of security)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/The_basics_of_security.md)
 - [암호의 기본(Basics of password)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Basics_of_password.md)
 - [해시 함수(Hash function)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hash_function.md)
+- [공통키 암호 방식(Common key encryption method)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Common_key_encryption_method.md)
