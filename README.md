@@ -174,3 +174,6 @@
 - [소수 판별법(Primality test)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Primality_test.md)
 - [연속길이 부호(Run length encrypt)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Run_length_encrypt.md)
 - [허프만 부호(Huffman code)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Huffman_code.md)
+- [보안의 기본(The basics of security)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/The_basics_of_security.md)
+- [암호의 기본(Basics of password)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Basics_of_password.md)
+- [해시 함수(Hash function)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hash_function.md)
