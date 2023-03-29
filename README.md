@@ -179,3 +179,5 @@
 - [해시 함수(Hash function)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hash_function.md)
 - [공통키 암호 방식(Common key encryption method)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Common_key_encryption_method.md)
 - [공개키 암호 방식(Public key encryption method)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Public_key_encryption_method.md)
+- [하이브리드 암호 방식(Hybrid encryption method)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hybrid_encryption_method.md)
+- [디피-헬만 키 교환법(Diffie–Hellman key exchange)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Diffie_Hellman_key_exchange.md)
