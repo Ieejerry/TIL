@@ -182,3 +182,4 @@
 - [하이브리드 암호 방식(Hybrid encryption method)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Hybrid_encryption_method.md)
 - [디피-헬만 키 교환법(Diffie–Hellman key exchange)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Diffie_Hellman_key_exchange.md)
 - [메세지 인증 코드(Message authentication code)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Message_authentication_code.md)
+- [전자 인증서(Electronic certificate)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Electronic_certificate.md)
