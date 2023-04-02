@@ -184,3 +184,4 @@
 - [메세지 인증 코드(Message authentication code)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Message_authentication_code.md)
 - [전자 인증서(Electronic certificate)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Electronic_certificate.md)
 - [전자 서명(Electronic signature)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/Electronic_signature.md)
+- [페이지 랭크(PageRank)](https://github.com/leehenson/TIL/blob/master/Algorithm_picture_book/PageRank.md)
