@@ -190,3 +190,4 @@
 ## Algorithm & Data Structure
 
 - [빅오 표기법(Big-O notation)](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Big_O_notation.md)
+- [Linked List의 개념](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/The_concept_of_linked_list.md)
