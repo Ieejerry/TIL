@@ -196,3 +196,4 @@
 - [LinkedListNode의 구현 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Implementing%20LinkedListNode%20in%20Java.md)
 - [LinkedList 중복값 삭제 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Deleting%20a%20Linked%20List%20Duplicate%20Value%20in%20Java.md)
 - [단방향 Linked List 뒤부터 세기 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Count%20from%20behind%20a%20one-way%20linked%20list%20in%20java.md)
+- [단방향 Linked List 중간노드 삭제 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Deleting%20a%20Unidirectional%20Linked%20List%20Intermediate%20Node.md)
