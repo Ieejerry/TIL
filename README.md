@@ -206,5 +206,5 @@
 - [Stack 구현하기 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Implementing_a_Stack.md)
 - [Queue 구현하기 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Implementing_a_Queue.md)
 - [두개의 Stack으로 Queue만들기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Create_Queue_with_Two_Stacks.md)
-- [Stack ](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Sort_Stack.md)
+- [Stack 정렬하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Sort_Stack.md)
 - [LinkedList로 Queue구현하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Implementing_Queue_with_LinkedList.md)
