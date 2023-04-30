@@ -217,3 +217,4 @@
 - [Graph에서 두지점의 경로찾기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Find_a_path_to_two_points_in_Graph.md)
 - [배열을 이진검색트리로 만들기 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Create_an_array_as_a_binary_search_tree_in_Java.md)
 - [이진트리를 레벨단위 리스트로 변형하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/To_transform_a_binary_tree_into_a_list_of_levels.md)
+- [Tree의 Balance 확인하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Check_the_balance_of_the_tree.md)
