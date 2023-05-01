@@ -218,3 +218,4 @@
 - [배열을 이진검색트리로 만들기 in Java](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Create_an_array_as_a_binary_search_tree_in_Java.md)
 - [이진트리를 레벨단위 리스트로 변형하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/To_transform_a_binary_tree_into_a_list_of_levels.md)
 - [Tree의 Balance 확인하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Check_the_balance_of_the_tree.md)
+- [주어진 트리가 이진검색트리인지 확인하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Determine_if_the_given_tree_is_a_binary_search_tree.md)
