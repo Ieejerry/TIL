@@ -230,3 +230,6 @@
 - [라이브러리 살펴보기](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Project_Preferences/Explore_the_library.md)
 - [View 환경설정](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Project_Preferences/View_preferences.md)
 - [빌드하고 실행하기](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Project_Preferences/Build_and_run.md)
+- [정적 컨텐츠](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Spring_Web_Development_Foundation/Static_Content.md)
+- [MVC와 템플릿 엔진](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Spring_Web_Development_Foundation/MVC_and_Template_Engine.md)
+- [API](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Spring_Web_Development_Foundation/API.md)
