@@ -221,6 +221,7 @@
 - [주어진 트리가 이진검색트리인지 확인하기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Determine_if_the_given_tree_is_a_binary_search_tree.md)
 - [이진검색트리에서 다음노드 찾기 (inorder traverse)](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Find_the_next_node_in_the_binary_search_tree_(order%20traverse).md)
 - [Graph에 명시된 관계에 따라 데이터 뽑아오기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Pull_data_based_on_the_relationship_specified_in_Graph.md)
+- [Tree에서 두노드의 첫번째 공통부모 찾기](https://github.com/leehenson/TIL/blob/master/Algorithm_and_DataStructure.md/Find_the_first_common_parent_of_the_two_nodes_in_the_tree.md)
 
 ## Spring Boot
 
