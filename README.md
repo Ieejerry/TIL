@@ -239,3 +239,5 @@
 - [회원 리포지토리 테스트 케이스 작성](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Backend_Development.md/Creating_a_Member_Repository_Test_Case.md)
 - [회원 서비스 개발](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Backend_Development.md/Member_service_development.md)
 - [회원 서비스 테스트](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Backend_Development.md/Member_service_test.md)
+- [자바 코드로 직접 스프링 빈 등록하기](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Spring_Beans_and_Dependencies/Registering_Spring_Beans_Directly_with_Java_Code.md)
+- [컴포넌트 스캔과 자동 의존관계 설정](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Spring_Beans_and_Dependencies/Scan_components_and_set_up_automatic_dependencies.md)
