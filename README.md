@@ -250,3 +250,5 @@
 - [회원 웹 기능 - 홈 화면 추가](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Web_MVC_Development/Add_Home_Screen.md)
 - [회원 웹 기능 - 등록](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Web_MVC_Development/Registration.md)
 - [회원 웹 기능 - 조회](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/Web_MVC_Development/Inquiry.md)
+- [AOP가 필요한 상황](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/AOP/Situation_where_AOP_is_required.md)
+- [AOP 적용](https://github.com/leehenson/TIL/blob/master/Spring_Boot/Introduction_to_Spring/AOP/Apply_AOP.md)
